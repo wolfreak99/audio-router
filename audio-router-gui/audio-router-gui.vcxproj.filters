@@ -66,7 +66,7 @@
     <ClInclude Include="bootstrapper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="clsSysTray.h">
+    <ClInclude Include="SysTray.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -124,7 +124,7 @@
     <ClCompile Include="bootstrapper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="clsSysTray.cpp">
+    <ClCompile Include="SysTray.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

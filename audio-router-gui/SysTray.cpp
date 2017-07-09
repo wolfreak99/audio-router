@@ -1,8 +1,8 @@
-#include "clsSysTray.h"
+#include "SysTray.h"
 #include "resource.h"
 
 
-clsSysTray::clsSysTray()
+SysTray::SysTray()
 {
     bInTray = false;
     NotifyIconData.cbSize = sizeof(NotifyIconData);
@@ -15,11 +15,11 @@ clsSysTray::clsSysTray()
 }
 
 
-clsSysTray::~clsSysTray()
+SysTray::~SysTray()
 {
 }
 
-BOOL clsSysTray::SetIcon(HICON hNewIcon)
+BOOL SysTray::SetIcon(HICON hNewIcon)
 {
     NotifyIconData.hIcon = hNewIcon;
     if (bInTray)
@@ -36,12 +36,12 @@ BOOL clsSysTray::SetIcon(HICON hNewIcon)
         return (1);
 }
 
-HICON clsSysTray::GetIcon()
+HICON SysTray::GetIcon()
 {
     return NotifyIconData.hIcon;
 }
 
-BOOL clsSysTray::SetTipText(char *lpstrNewTipText)
+BOOL SysTray::SetTipText(char *lpstrNewTipText)
 {
     //strncpy(NotifyIconData.szTip, lpstrNewTipText);
     if (bInTray)
@@ -58,12 +58,12 @@ BOOL clsSysTray::SetTipText(char *lpstrNewTipText)
         return (1);
 }
 
-char *clsSysTray::GetTipText()
+char *SysTray::GetTipText()
 {
     return "test"; // NotifyIconData.szTip;
 }
 
-BOOL clsSysTray::AddIcon()
+BOOL SysTray::AddIcon()
 {
     BOOL iRetVal;
     NotifyIconData.hWnd = hWnd;
@@ -77,7 +77,7 @@ BOOL clsSysTray::AddIcon()
     return iRetVal;
 }
 
-BOOL clsSysTray::RemoveIcon()
+BOOL SysTray::RemoveIcon()
 {
     BOOL iRetVal;
     iRetVal = Shell_NotifyIcon(NIM_DELETE, &NotifyIconData);

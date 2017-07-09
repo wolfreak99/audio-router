@@ -6,11 +6,11 @@
 #define WM_TRAYNOTIFY 0XA44C
 #include <shellapi.h>
 
-class clsSysTray
+class SysTray
 {
 public:
-    clsSysTray();
-    ~clsSysTray();
+    SysTray();
+    ~SysTray();
     BOOL SetIcon(HICON hNewIcon);
     HICON GetIcon();
     BOOL SetTipText(char *lpstrNewTipText);

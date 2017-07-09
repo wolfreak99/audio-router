@@ -7,7 +7,7 @@
 #include <shellapi.h>
 
 // TODO: by wolfreak99: This may not be needed
-#include "clsSysTray.h"
+#include "SysTray.h"
 
 #define WIN_WIDTH 970//400
 #define WIN_HEIGHT 670//360
