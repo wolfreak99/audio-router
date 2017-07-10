@@ -10,18 +10,20 @@ delegation::delegation()
 }
 
 delegation::~delegation()
-{
-}
+{}
 
 void delegation::start_listen()
 {
-    HANDLE hpipe = CreateNamedPipe(PIPE_NAME, PIPE_ACCESS_DUPLEX, 
+    HANDLE hpipe = CreateNamedPipe(PIPE_NAME, PIPE_ACCESS_DUPLEX,
         PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE | PIPE_WAIT,
         PIPE_UNLIMITED_INSTANCES,
-        OUTPUT_SIZE, INPUT_SIZE, 0, 
+        OUTPUT_SIZE, INPUT_SIZE, 0,
         security_attributes(GENERIC_ALL, security_attributes::DEFAULT).get());
-    if(!hpipe)
+
+    if (!hpipe) {
         throw_errormessage(GetLastError());
+    }
+
     CHandle hthr(CreateThread(NULL, 0, pipe_listener_proc, hpipe, 0, NULL));
     assert(hthr);
 }
@@ -30,20 +32,19 @@ DWORD delegation::pipe_listener_proc(LPVOID arg)
 {
     CHandle hpipe(arg);
 
-    const BOOL connected = 
+    const BOOL connected =
         ConnectNamedPipe(hpipe, NULL) ? TRUE : (GetLastError() == ERROR_PIPE_CONNECTED);
+
     start_listen();
 
-    if(connected)
-    {
+    if (connected) {
         // delegate to do exe
         DWORD pid_tid_both[3];
         DWORD read;
-        if(ReadFile(hpipe, &pid_tid_both, INPUT_SIZE, &read, NULL) && read == INPUT_SIZE)
-        {
+
+        if (ReadFile(hpipe, &pid_tid_both, INPUT_SIZE, &read, NULL) && read == INPUT_SIZE) {
             DWORD exitcode = 1, written;
-            try
-            {
+            try {
                 app_list::app_info app;
                 app.x86 = true; // default
                 app.id = pid_tid_both[0];
@@ -56,8 +57,7 @@ DWORD delegation::pipe_listener_proc(LPVOID arg)
                 assert(b);
                 assert(written == OUTPUT_SIZE);
             }
-            catch(std::wstring err)
-            {
+            catch (std::wstring err) {
                 BOOL b = WriteFile(hpipe, &exitcode, OUTPUT_SIZE, &written, NULL);
                 FlushFileBuffers(hpipe);
                 assert(b);
@@ -73,4 +73,4 @@ DWORD delegation::pipe_listener_proc(LPVOID arg)
     }
 
     return 0;
-}
+} // pipe_listener_proc

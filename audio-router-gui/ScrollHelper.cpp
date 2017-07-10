@@ -1,4 +1,5 @@
 // Filename: ScrollHelper.cpp
+
 // 2005-07-01 nschan Initial revision.
 // 2005-09-08 nschan Added GetClientRectSB() function.
 
@@ -8,8 +9,8 @@
 #define ASSERT assert
 
 #ifdef _DEBUG
-#define new DEBUG_NEW
-#undef THIS_FILE
+# define new DEBUG_NEW
+# undef THIS_FILE
 static char THIS_FILE[] = __FILE__;
 #endif
 
@@ -17,9 +18,9 @@ typedef CWindow CWnd;
 
 // Helper function to get client rect with possible
 // modification by adding scrollbar width/height.
-void GetClientRectSB(CWnd* pWnd, CRect& rect)
+void GetClientRectSB(CWnd *pWnd, CRect& rect)
 {
-    ASSERT( pWnd != NULL );
+    ASSERT(pWnd != NULL);
 
     CRect winRect;
     pWnd->GetWindowRect(&winRect);
@@ -30,20 +31,23 @@ void GetClientRectSB(CWnd* pWnd, CRect& rect)
     int cxSB = ::GetSystemMetrics(SM_CXVSCROLL);
     int cySB = ::GetSystemMetrics(SM_CYHSCROLL);
 
-    if ( winRect.right >= (rect.right + cxSB) )
+    if (winRect.right >= (rect.right + cxSB)) {
         rect.right += cxSB;
-    if ( winRect.bottom >= (rect.bottom + cySB) )
+    }
+
+    if (winRect.bottom >= (rect.bottom + cySB)) {
         rect.bottom += cySB;
-}
+    }
+} // GetClientRectSB
 
 // CScrollHelper /////////////////////////////////////////////////////////////////////
 
 CScrollHelper::CScrollHelper()
 {
     m_attachWnd   = NULL;
-    m_pageSize    = CSize(0,0);
-    m_displaySize = CSize(0,0);
-    m_scrollPos   = CSize(0,0);
+    m_pageSize    = CSize(0, 0);
+    m_displaySize = CSize(0, 0);
+    m_scrollPos   = CSize(0, 0);
 }
 
 CScrollHelper::~CScrollHelper()
@@ -51,7 +55,7 @@ CScrollHelper::~CScrollHelper()
     DetachWnd();
 }
 
-void CScrollHelper::AttachWnd(CWnd* pWnd)
+void CScrollHelper::AttachWnd(CWnd *pWnd)
 {
     m_attachWnd = pWnd;
 }
@@ -65,8 +69,9 @@ void CScrollHelper::SetDisplaySize(int displayWidth, int displayHeight)
 {
     m_displaySize = CSize(displayWidth, displayHeight);
 
-    if ( m_attachWnd != NULL && ::IsWindow(m_attachWnd->m_hWnd) )
+    if (m_attachWnd != NULL && ::IsWindow(m_attachWnd->m_hWnd)) {
         UpdateScrollInfo();
+    }
 }
 
 const CSize& CScrollHelper::GetDisplaySize() const
@@ -86,13 +91,12 @@ const CSize& CScrollHelper::GetPageSize() const
 
 void CScrollHelper::ScrollToOrigin(bool scrollLeft, bool scrollTop)
 {
-    if ( m_attachWnd == NULL )
+    if (m_attachWnd == NULL) {
         return;
+    }
 
-    if ( scrollLeft )
-    {
-        if ( m_displaySize.cx > 0 && m_pageSize.cx > 0 && m_scrollPos.cx > 0 )
-        {
+    if (scrollLeft) {
+        if (m_displaySize.cx > 0 && m_pageSize.cx > 0 && m_scrollPos.cx > 0) {
             int deltaPos = -m_scrollPos.cx;
             m_scrollPos.cx += deltaPos;
             m_attachWnd->SetScrollPos(SB_HORZ, m_scrollPos.cx, TRUE);
@@ -100,168 +104,189 @@ void CScrollHelper::ScrollToOrigin(bool scrollLeft, bool scrollTop)
         }
     }
 
-    if ( scrollTop )
-    {
-        if ( m_displaySize.cy > 0 && m_pageSize.cy > 0 && m_scrollPos.cy > 0 )
-        {
+    if (scrollTop) {
+        if (m_displaySize.cy > 0 && m_pageSize.cy > 0 && m_scrollPos.cy > 0) {
             int deltaPos = -m_scrollPos.cy;
             m_scrollPos.cy += deltaPos;
             m_attachWnd->SetScrollPos(SB_VERT, m_scrollPos.cy, TRUE);
             m_attachWnd->ScrollWindow(0, -deltaPos);
         }
     }
-}
+} // ScrollToOrigin
 
-void CScrollHelper::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
+void CScrollHelper::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar *pScrollBar)
 {
-    if ( m_attachWnd == NULL )
+    if (m_attachWnd == NULL) {
         return;
+    }
 
     const int lineOffset = 60;
 
     // Compute the desired change or delta in scroll position.
     int deltaPos = 0;
-    switch( nSBCode )
-    {
+
+    switch (nSBCode) {
     case SB_LINELEFT:
+
         // Left scroll arrow was pressed.
         deltaPos = -lineOffset;
         break;
 
     case SB_LINERIGHT:
+
         // Right scroll arrow was pressed.
         deltaPos = lineOffset;
         break;
 
     case SB_PAGELEFT:
+
         // User clicked inbetween left arrow and thumb.
         deltaPos = -m_pageSize.cx;
         break;
 
     case SB_PAGERIGHT:
+
         // User clicked inbetween thumb and right arrow.
         deltaPos = m_pageSize.cx;
         break;
 
     case SB_THUMBTRACK:
+
         // Scrollbar thumb is being dragged.
         deltaPos = Get32BitScrollPos(SB_HORZ, pScrollBar) - m_scrollPos.cx;
         break;
 
     case SB_THUMBPOSITION:
+
         // Scrollbar thumb was released.
         deltaPos = Get32BitScrollPos(SB_HORZ, pScrollBar) - m_scrollPos.cx;
         break;
 
     default:
+
         // We don't process other scrollbar messages.
         return;
-    }
+    } // switch
 
     // Compute the new scroll position.
     int newScrollPos = m_scrollPos.cx + deltaPos;
 
     // If the new scroll position is negative, we adjust
     // deltaPos in order to scroll the window back to origin.
-    if ( newScrollPos < 0 )
+    if (newScrollPos < 0) {
         deltaPos = -m_scrollPos.cx;
+    }
 
     // If the new scroll position is greater than the max scroll position,
     // we adjust deltaPos in order to scroll the window precisely to the
     // maximum position.
     int maxScrollPos = m_displaySize.cx - m_pageSize.cx;
-    if ( newScrollPos > maxScrollPos )
+
+    if (newScrollPos > maxScrollPos) {
         deltaPos = maxScrollPos - m_scrollPos.cx;
+    }
 
     // Scroll the window if needed.
-    if ( deltaPos != 0 )
-    {
+    if (deltaPos != 0) {
         m_scrollPos.cx += deltaPos;
         m_attachWnd->SetScrollPos(SB_HORZ, m_scrollPos.cx, TRUE);
         m_attachWnd->ScrollWindow(-deltaPos, 0);
     }
-}
+} // OnHScroll
 
-void CScrollHelper::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
+void CScrollHelper::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar *pScrollBar)
 {
-    if ( m_attachWnd == NULL )
+    if (m_attachWnd == NULL) {
         return;
+    }
 
     const int lineOffset = 60;
 
     // Compute the desired change or delta in scroll position.
     int deltaPos = 0;
-    switch( nSBCode )
-    {
+
+    switch (nSBCode) {
     case SB_LINEUP:
+
         // Up arrow button on scrollbar was pressed.
         deltaPos = -lineOffset;
         break;
 
     case SB_LINEDOWN:
+
         // Down arrow button on scrollbar was pressed.
         deltaPos = lineOffset;
         break;
 
     case SB_PAGEUP:
+
         // User clicked inbetween up arrow and thumb.
         deltaPos = -m_pageSize.cy;
         break;
 
     case SB_PAGEDOWN:
+
         // User clicked inbetween thumb and down arrow.
         deltaPos = m_pageSize.cy;
         break;
 
     case SB_THUMBTRACK:
+
         // Scrollbar thumb is being dragged.
         deltaPos = Get32BitScrollPos(SB_VERT, pScrollBar) - m_scrollPos.cy;
         break;
 
     case SB_THUMBPOSITION:
+
         // Scrollbar thumb was released.
         deltaPos = Get32BitScrollPos(SB_VERT, pScrollBar) - m_scrollPos.cy;
         break;
 
     default:
+
         // We don't process other scrollbar messages.
         return;
-    }
+    } // switch
 
     // Compute the new scroll position.
     int newScrollPos = m_scrollPos.cy + deltaPos;
 
     // If the new scroll position is negative, we adjust
     // deltaPos in order to scroll the window back to origin.
-    if ( newScrollPos < 0 )
+    if (newScrollPos < 0) {
         deltaPos = -m_scrollPos.cy;
+    }
 
     // If the new scroll position is greater than the max scroll position,
     // we adjust deltaPos in order to scroll the window precisely to the
     // maximum position.
     int maxScrollPos = m_displaySize.cy - m_pageSize.cy;
-    if ( newScrollPos > maxScrollPos )
+
+    if (newScrollPos > maxScrollPos) {
         deltaPos = maxScrollPos - m_scrollPos.cy;
+    }
 
     // Scroll the window if needed.
-    if ( deltaPos != 0 )
-    {
+    if (deltaPos != 0) {
         m_scrollPos.cy += deltaPos;
         m_attachWnd->SetScrollPos(SB_VERT, m_scrollPos.cy, TRUE);
         m_attachWnd->ScrollWindow(0, -deltaPos);
     }
-}
+} // OnVScroll
 
 BOOL CScrollHelper::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 {
-    if ( m_attachWnd == NULL )
+    if (m_attachWnd == NULL) {
         return FALSE;
+    }
 
     // Don't do anything if the vertical scrollbar is not enabled.
     int scrollMin = 0, scrollMax = 0;
     m_attachWnd->GetScrollRange(SB_VERT, &scrollMin, &scrollMax);
-    if ( scrollMin == scrollMax )
+
+    if (scrollMin == scrollMax) {
         return FALSE;
+    }
 
     // Compute the number of scrolling increments requested.
     int numScrollIncrements = abs(zDelta) / WHEEL_DELTA;
@@ -273,8 +298,7 @@ BOOL CScrollHelper::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
     ::SystemParametersInfo(SPI_GETWHEELSCROLLLINES, 0, &numScrollLinesPerIncrement, 0);
 
     // Check if a page scroll was requested.
-    if ( numScrollLinesPerIncrement == WHEEL_PAGESCROLL )
-    {
+    if (numScrollLinesPerIncrement == WHEEL_PAGESCROLL) {
         // Call the vscroll message handler to do the work.
         OnVScroll(zDelta > 0 ? SB_PAGEUP : SB_PAGEDOWN, 0, NULL);
         return TRUE;
@@ -284,36 +308,38 @@ BOOL CScrollHelper::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
     int numScrollLines = numScrollIncrements * numScrollLinesPerIncrement;
 
     // Adjust numScrollLines to slow down the scrolling a bit more.
-    numScrollLines = max(numScrollLines/3, 1);
+    numScrollLines = max(numScrollLines / 3, 1);
 
     // Do the scrolling.
-    for(int i = 0; i < numScrollLines; ++i)
-    {
+    for (int i = 0; i < numScrollLines; ++i) {
         // Call the vscroll message handler to do the work.
         OnVScroll(zDelta > 0 ? SB_LINEUP : SB_LINEDOWN, 0, NULL);
     }
 
     return TRUE;
-}
+} // OnMouseWheel
 
 void CScrollHelper::OnSize(UINT nType, int cx, int cy)
 {
     UpdateScrollInfo();
 }
 
-int CScrollHelper::Get32BitScrollPos(int bar, CScrollBar* pScrollBar)
+int CScrollHelper::Get32BitScrollPos(int bar, CScrollBar *pScrollBar)
 {
     // Code below is from MSDN Article ID 152252, "How To Get
     // 32-bit Scroll Position During Scroll Messages".
 
     // First determine if the user scrolled a scroll bar control
     // on the window or scrolled the window itself.
-    ASSERT( m_attachWnd != NULL );
+    ASSERT(m_attachWnd != NULL);
     HWND hWndScroll;
-    if ( pScrollBar == NULL )
+
+    if (pScrollBar == NULL) {
         hWndScroll = m_attachWnd->m_hWnd;
-    else
+    }
+    else {
         hWndScroll = pScrollBar->m_hWnd;
+    }
 
     SCROLLINFO si;
     si.cbSize = sizeof(SCROLLINFO);
@@ -323,12 +349,13 @@ int CScrollHelper::Get32BitScrollPos(int bar, CScrollBar* pScrollBar)
     int scrollPos = si.nTrackPos;
 
     return scrollPos;
-}
+} // Get32BitScrollPos
 
 void CScrollHelper::UpdateScrollInfo()
 {
-    if ( m_attachWnd == NULL )
+    if (m_attachWnd == NULL) {
         return;
+    }
 
     // Get the width/height of the attached wnd that includes the area
     // covered by the scrollbars (if any). The reason we need this is
@@ -341,7 +368,7 @@ void CScrollHelper::UpdateScrollInfo()
     CSize windowSize(rect.Width(), rect.Height());
 
     // Update horizontal scrollbar.
-    CSize deltaPos(0,0);
+    CSize deltaPos(0, 0);
     UpdateScrollBar(SB_HORZ, windowSize.cx, m_displaySize.cx,
         m_pageSize.cx, m_scrollPos.cx, deltaPos.cx);
 
@@ -355,31 +382,35 @@ void CScrollHelper::UpdateScrollInfo()
     // at the left side disappear from the view. Then the user
     // resizes the window wider until scrollbars disappear. Without
     // this code below, the controls off the page will be gone forever.
-    if ( deltaPos.cx != 0 || deltaPos.cy != 0 )
-    {
+    if (deltaPos.cx != 0 || deltaPos.cy != 0) {
         m_attachWnd->ScrollWindow(deltaPos.cx, deltaPos.cy);
-    }                                                        
-}
+    }
+} // UpdateScrollInfo
 
-void CScrollHelper::UpdateScrollBar(int bar, int windowSize, int displaySize,
-                                    LONG& pageSize, LONG& scrollPos, LONG& deltaPos)
+void CScrollHelper::UpdateScrollBar(int bar,
+    int windowSize,
+    int displaySize,
+    LONG& pageSize,
+    LONG& scrollPos,
+    LONG& deltaPos)
 {
     int scrollMax = 0;
+
     deltaPos = 0;
-    if ( windowSize < displaySize )
-    {
+
+    if (windowSize < displaySize) {
         scrollMax = displaySize - 1;
-        if ( pageSize > 0 && scrollPos > 0 )
-        {
+
+        if (pageSize > 0 && scrollPos > 0) {
             // Adjust the scroll position when the window size is changed.
             scrollPos = (LONG)(1.0 * scrollPos * windowSize / pageSize);
         }
+
         pageSize = windowSize;
         scrollPos = min(scrollPos, displaySize - pageSize - 1);
         deltaPos = m_attachWnd->GetScrollPos(bar) - scrollPos;
     }
-    else
-    {
+    else {
         // Force the scrollbar to go away.
         pageSize = 0;
         scrollPos = 0;
@@ -395,7 +426,6 @@ void CScrollHelper::UpdateScrollBar(int bar, int windowSize, int displaySize,
     si.nPage  = pageSize;
     si.nPos   = scrollPos;
     m_attachWnd->SetScrollInfo(bar, &si, TRUE);
-}
+} // UpdateScrollBar
 
 // END
-

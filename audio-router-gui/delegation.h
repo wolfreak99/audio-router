@@ -4,20 +4,22 @@
 
 #ifndef DELEGATION_ONLY_NAME
 
-#include <Windows.h>
-#include "wtl.h"
+# include <Windows.h>
+# include "wtl.h"
 
-#define OUTPUT_SIZE sizeof(DWORD)
-#define INPUT_SIZE (sizeof(DWORD) * 3)
+# define OUTPUT_SIZE sizeof(DWORD)
+# define INPUT_SIZE (sizeof(DWORD) * 3)
 
-class delegation
-{
+class delegation {
 private:
+
     static DWORD WINAPI pipe_listener_proc(LPVOID);
     static void start_listen();
+
 public:
+
     delegation();
     ~delegation();
 };
 
-#endif
+#endif // ifndef DELEGATION_ONLY_NAME
