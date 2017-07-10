@@ -6,14 +6,18 @@ branches:
   - develop
 max_jobs: 4
 image: Visual Studio 2017
-configuration:
-- Release
-- Debug
+configuration: Release
 platform:
-- Win32
 - x64
+- Win32
 clone_folder: c:\projects\audio-router
+nuget:
+  disable_publish_on_pr: true
 build:
   project: c:\projects\audio-router\audio-router.sln
-  publish_nuget: true
   verbosity: minimal
+artifacts:
+- path: '\bin\Release\x64'
+  name: Release_x64
+- path: '\bin\Release\Win32'
+  name: Release_Win32
