@@ -1,89 +1,119 @@
 #include "SysTray.h"
-#include "resource.h"
-
+#include "window.h"
+// TODO/wolfreak99: Create a common.h for stuff such as this
+#include <assert.h>
 
 SysTray::SysTray()
 {
     bInTray = false;
-    NotifyIconData.cbSize = sizeof(NotifyIconData);
-    NotifyIconData.uID = uID = 2;
-    NotifyIconData.uFlags = NIF_ICON | NIF_TIP | NIF_MESSAGE;
-    NotifyIconData.uCallbackMessage = WM_TRAYNOTIFY;
-    NotifyIconData.hIcon = LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDR_MAINFRAME));
-    NotifyIconData.szTip[0] = '\0';
-    NotifyIconData.hWnd = NULL;
 }
-
 
 SysTray::~SysTray()
 {
 }
 
+void SysTray::Create(window& parent, UINT uid)
+{
+    m_NotifyIconData.cbSize = NOTIFYICONDATAA_V1_SIZE;
+    m_NotifyIconData.uFlags = NIF_ICON | NIF_MESSAGE | NIF_TIP;
+    m_NotifyIconData.uCallbackMessage = WM_SYSTEMTRAYICON;
+
+    m_NotifyIconData.hWnd = parent.m_hWnd;
+    m_NotifyIconData.uID = uid;
+    m_NotifyIconData.hIcon = AtlLoadIconImage(IDR_MAINFRAME, LR_DEFAULTCOLOR,
+        GetSystemMetrics(SM_CXSMICON), GetSystemMetrics(SM_CYSMICON));
+}
+
+void SysTray::Destroy()
+{
+
+}
+
 BOOL SysTray::SetIcon(HICON hNewIcon)
 {
-    NotifyIconData.hIcon = hNewIcon;
-    if (bInTray)
-    {
-        BOOL iRetVal;
-        iRetVal = Shell_NotifyIcon(NIM_MODIFY, &NotifyIconData);
-        if (iRetVal)
-        {
-            bInTray = true;
+    try {
+        m_NotifyIconData.hIcon = hNewIcon;
+        // Update the icon if it is visible.
+        if (bInTray) {
+            BOOL iRetVal;
+            iRetVal = Shell_NotifyIcon(NIM_MODIFY, &m_NotifyIconData);
+            if (iRetVal) {
+                bInTray = true;
+            }
+            return iRetVal;
         }
-        return iRetVal;
+        return 1;
     }
-    else
-        return (1);
+    catch (std::wstring err) {
+        throw err;
+        assert(false);
+        return 0;
+    }
 }
 
 HICON SysTray::GetIcon()
 {
-    return NotifyIconData.hIcon;
+    return m_NotifyIconData.hIcon;
 }
 
-BOOL SysTray::SetTipText(char *lpstrNewTipText)
+BOOL SysTray::SetTipText(ATL::CString newTipText)
 {
-    //strncpy(NotifyIconData.szTip, lpstrNewTipText);
-    if (bInTray)
-    {
-        BOOL iRetVal;
-        iRetVal = Shell_NotifyIcon(NIM_MODIFY, &NotifyIconData);
-        if (iRetVal)
-        {
-            bInTray = true;
+    try {
+        _tcscpy_s(m_NotifyIconData.szTip, newTipText);
+        // Update the icon if it is visible.
+        if (bInTray) {
+            BOOL iRetVal;
+            iRetVal = Shell_NotifyIcon(NIM_MODIFY, &m_NotifyIconData);
+            if (iRetVal) {
+                bInTray = true;
+            }
+            return iRetVal;
         }
-        return iRetVal;
+        return 1;
     }
-    else
-        return (1);
+    catch (std::wstring err) {
+        throw err;
+        assert(false);
+        return 0;
+    }
 }
 
 char *SysTray::GetTipText()
 {
+    // TODO/wolfreak99: Find out how to make this text show up, and then try to get commented code to show.
     return "test"; // NotifyIconData.szTip;
 }
 
 BOOL SysTray::AddIcon()
 {
-    BOOL iRetVal;
-    NotifyIconData.hWnd = hWnd;
-    NotifyIconData.uID = uID;
-    iRetVal = Shell_NotifyIcon(NIM_ADD, &NotifyIconData);
-    if (iRetVal)
-    {
-        bInTray = true;
-
+    assert(m_NotifyIconData.cbSize);
+    assert(!bInTray);
+    
+    if (!bInTray) {
+        BOOL iRetVal = Shell_NotifyIcon(NIM_ADD, &m_NotifyIconData);
+        assert(iRetVal);
+        if (iRetVal) {
+            bInTray = true;
+        }
+        return iRetVal;
     }
-    return iRetVal;
+
+    return 0;
 }
 
 BOOL SysTray::RemoveIcon()
 {
-    BOOL iRetVal;
-    iRetVal = Shell_NotifyIcon(NIM_DELETE, &NotifyIconData);
-    if (iRetVal)
-    {
-        bInTray = false;
+    assert(m_NotifyIconData.cbSize);
+    assert(bInTray);
+
+    if (bInTray) {
+        BOOL iRetVal = Shell_NotifyIcon(NIM_DELETE, &m_NotifyIconData);
+        assert(iRetVal);
+        if (iRetVal) {
+            bInTray = false;
+        }
+        return iRetVal;
     }
-    return iRetVal;
+
+    return 0;
 }
