@@ -155,13 +155,12 @@ LRESULT window::OnFileRefreshlist(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL
 LRESULT window::OnAbout(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled)
 {
     // TODO/wolfreak99: Update this about to be more accurate, CLAIM OUR STOLEN FUCKING TERRITORY, FEARLESS OF LAWSUITS.
-    this->MessageBoxW(
-        L"Audio Router version 0.10.2.\n"\
-        L"\nIf you come across any bugs(especially relating to routing or duplicating), "\
-        L"or just have an idea for a new feature, "\
-        L"please send a PM to the developer on reddit: reddit.com/user/audiorouterdev/",
-        L"About", MB_ICONINFORMATION);
-
+    this->MessageBoxW(L"Audio Router, the 'Revived from the grave' version.\n" \
+        L"I have taken over this project, due to inactivity by the original developer." \
+        L"If you come across any bugs (especially related to, well, routing audio), " \
+        L"Have a feature suggestion, or you are the original dev and wish to file a lawsuit, "\
+        L"Feel free to post an issue on the github page and I will get back to you when I can!\n\n"\
+        L"https://github.com/wolfreak99/audio-router", L"About", MB_ICONINFORMATION);
     return 0;
 }
 
