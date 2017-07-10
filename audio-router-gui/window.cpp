@@ -4,16 +4,19 @@
 telemetry* telemetry_m = NULL;
 #endif
 
-// TODO: by wolfreak99: Check audiorouterdevs "remove saved routing functionality"
-// To determine if bootstrap (and telemetry) are related to feature..
+// TODO/wolfreak99: Check audiorouterdevs "remove saved routing functionality", To determine if bootstrap (and telemetry) are related to feature.
 #ifdef ENABLE_BOOTSTRAP
 window::window(bootstrapper* bootstrap) : dlg_main_b(true), bootstrap(bootstrap)
 #else
-window::window(/*bootstrapper* bootstrap*/) : dlg_main_b(true)/*, bootstrap(bootstrap)*/
+window::window() : dlg_main_b(true)
 #endif
 {
     this->dlg_main = new dialog_main(*this);
     this->form_view = new formview(*this);
+
+    // our windows hWnd is still null, so we can only initialize sysTray partially.
+    // the rest is handled in OnCreate. (what a bunch of shit)
+    this->m_SysTray = new SysTray();
 }
 
 window::~window()
@@ -21,7 +24,8 @@ window::~window()
     if (this->dlg_main_b)
         delete this->dlg_main;
     delete this->form_view;
-    
+    delete this->m_SysTray;
+
 #ifndef DISABLE_TELEMETRY
     delete telemetry_m;
     telemetry_m = NULL;
@@ -37,21 +41,28 @@ int window::OnCreate(LPCREATESTRUCT lpcs)
     this->m_hWndClient = this->dlg_main->Create(this->m_hWnd);
     this->dlg_main->ShowWindow(SW_SHOW);
 
-    ShowSystemTrayIcon();
+    //Set up handles for the system tray.
+    m_SysTray->Create(*this, 1);
+
+    ATL::CString sWindowText;
+    GetWindowText(sWindowText);
+    m_SysTray->SetTipText(sWindowText);
+    m_SysTray->AddIcon();
 
     return 0;
 }
 
 LRESULT window::OnDestroy(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
-    HideSystemTrayIcon();
+    m_SysTray->RemoveIcon();
     return 0;
 }
 
 LRESULT window::OnQuit(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
     this->DestroyWindow();
-    // TODO: by wolfreak99: This may not even be needed
+    
+    // TODO/wolfreak99: This may not even be needed.
     PostQuitMessage(0);
     return 0;
 }
@@ -63,21 +74,15 @@ LRESULT window::OnNcHitTest(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHand
 
 LRESULT window::OnSysCommand(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
-    bHandled = FALSE;
-    // TODO: by wolfreak99: does "bHandled" act the same way as unityengines event eating?
-    // Does this being true basically mean the system won't handle the event afterward, and
-    // it being false mean it would handle it? if so, consider utilizing it when ensuring
-    // the tray menu exit closes properly..
-
     switch (wParam) {
     case SC_CLOSE:
         // Closing the window shows the icon while hiding it from the minimized windows bar.
         this->ShowWindow(SW_HIDE);
+        // We do not need any further handling done, so set bHandled to TRUE
         bHandled = TRUE;
         break;
     case SC_RESTORE:
-        // TODO: by wolfreak99: This iteration may not be needed, as it's commented out
-        // as well in the aformentioned cherry-pick. i'm keeping it here for now just in case
+        // TODO/wolfreak99: This may not be needed, it's commented out eventually, but I'm keeping it here just incase
         for (dialog_main::dialog_arrays_t::iterator it = this->dlg_main->dialog_arrays.begin();
             it != this->dlg_main->dialog_arrays.end();
             it++) {
@@ -89,6 +94,11 @@ LRESULT window::OnSysCommand(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHan
         }
         ShowWindow(SW_SHOW);
         BringWindowToTop();
+        // Have windows still handle the rest
+        bHandled = FALSE;
+        break;
+    default:
+        bHandled = false;
         break;
     }
 
@@ -96,14 +106,13 @@ LRESULT window::OnSysCommand(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHan
 }
 
 LRESULT window::OnSystemTrayIcon(UINT, WPARAM wParam, LPARAM lParam, BOOL & bHandled) {
-
     ATLASSERT(wParam == 1);
     switch (lParam) {
     case WM_LBUTTONUP:
         ShowOrHideWindow();
         break;
     case WM_RBUTTONUP:
-        SetForegroundWindow(m_hWnd);
+        //SetForegroundWindow(m_hWnd);
 
         CPoint pos;
         ATLVERIFY(GetCursorPos(&pos));
@@ -128,12 +137,14 @@ LRESULT window::OnFileRefreshlist(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL
 
 LRESULT window::OnAbout(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled)
 {
+    // TODO/wolfreak99: Update this about to be more accurate, CLAIM OUR STOLEN FUCKING TERRITORY, FEARLESS OF LAWSUITS.
     this->MessageBoxW(
         L"Audio Router version 0.10.2.\n" \
         L"\nIf you come across any bugs(especially relating to routing or duplicating), " \
         L"or just have an idea for a new feature, " \
         L"please send a PM to the developer on reddit: reddit.com/user/audiorouterdev/",
         L"About", MB_ICONINFORMATION);
+
     return 0;
 }
 
@@ -151,7 +162,7 @@ LRESULT window::OnFileSwitchview(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL&
         this->form_view->SetWindowPos(NULL, &rc, SWP_NOZORDER | SWP_SHOWWINDOW);
     }
     else {
-        //TODO: by wolfreak99: Should form_view be deleted as well?
+        //TODO/wolfreak99: Should form_view be deleted as well?
         this->form_view->DestroyWindow();
 
         this->dlg_main = new dialog_main(*this);
@@ -167,14 +178,12 @@ LRESULT window::OnFileSwitchview(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL&
 
 LRESULT window::OnFileExit(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled)
 {
-    SendMessage(WM_QUIT);
-    return 0;
+    return Quit();
 }
 
 LRESULT window::OnTrayMenuExit(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled)
 {
-    SendMessage(WM_QUIT);
-    return 0;
+    return Quit();
 }
 
 LRESULT window::OnTrayMenuShowHide(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled)
@@ -193,34 +202,13 @@ void window::ShowOrHideWindow()
     }
 }
 
-void window::ShowSystemTrayIcon()
-{
-    HideSystemTrayIcon();
-
-    if (!m_NotifyIconData.cbSize) {
-        m_NotifyIconData.cbSize = NOTIFYICONDATAA_V1_SIZE;
-        m_NotifyIconData.hWnd = m_hWnd;
-        m_NotifyIconData.uID = 1;
-        m_NotifyIconData.uFlags = NIF_ICON | NIF_MESSAGE | NIF_TIP;
-        m_NotifyIconData.uCallbackMessage = WM_SYSTEMTRAYICON;
-        m_NotifyIconData.hIcon = AtlLoadIconImage(IDR_MAINFRAME, LR_DEFAULTCOLOR,
-            GetSystemMetrics(SM_CXSMICON), GetSystemMetrics(SM_CYSMICON));
-        ATL::CString sWindowText;
-        GetWindowText(sWindowText);
-        _tcscpy_s(m_NotifyIconData.szTip, sWindowText);
-    }
-
-    Shell_NotifyIcon(NIM_ADD, &m_NotifyIconData);
-}
-
-void window::HideSystemTrayIcon()
-{
-    if (m_NotifyIconData.cbSize) {
-        Shell_NotifyIcon(NIM_DELETE, &m_NotifyIconData);
-    }
-}
-
 bool window::IsWindowOpen()
 {
     return this->IsWindowVisible() && !this->IsIconic();
+}
+
+// Quits the program. Use this instead of calling SendMessage(WM_QUIT) everywhere.
+LRESULT window::Quit()
+{
+    return SendMessage(WM_QUIT);
 }

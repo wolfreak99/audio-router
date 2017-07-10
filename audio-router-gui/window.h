@@ -3,28 +3,35 @@
 #include "dialog_main.h"
 #include "formview.h"
 #include "bootstrapper.h"
+#include "SysTray.h"
 #include <memory>
 #include <shellapi.h>
-
-// TODO: by wolfreak99: This may not be needed
-#include "clsSysTray.h"
 
 #define WIN_WIDTH 970//400
 #define WIN_HEIGHT 670//360
 #define GET(type, item) reinterpret_cast<type&>(this->GetDlgItem(item))
+
+enum
+{
+    WM_FIRST = WM_APP,
+    WM_SYSTEMTRAYICON,
+};
 
 class window : public CFrameWindowImpl<window>
 {
 private:
     bool dlg_main_b;
 
-    NOTIFYICONDATA m_NotifyIconData;
+    SysTray* m_SysTray;
 
 public:
     dialog_main* dlg_main;
     formview* form_view;
 #ifdef ENABLE_BOOTSTRAP
     bootstrapper* bootstrap;
+#endif
+
+#ifdef ENABLE_BOOTSTRAP
     explicit window(bootstrapper*);
 #else
     explicit window();
@@ -50,21 +57,13 @@ public:
         /*MSG_WM_NCHITTEST(OnNcHitTest)*/
     END_MSG_MAP()
 
-    enum
-    {
-        WM_FIRST = WM_APP,
-        WM_SYSTEMTRAYICON,
-    };
-
     int OnCreate(LPCREATESTRUCT);
     
     LRESULT OnDestroy(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
     LRESULT OnQuit(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 
     LRESULT OnSysCommand(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
-    // TODO: by wolfreak99: I believe that some similar stuff was commented out earlier relating to the NcHit, whatever that means.
-    // Yeah, find out what NcHit even means, and find out if we really need to hit it.
-    // I'm sure a verbal negotiation is enough.
+    // TODO/wolfreak99: Find out what NcHit even means, and if it's needed. Do we even need to actually HIT it? can't a negotiation be enough?
     LRESULT OnNcHitTest(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
     
     LRESULT OnFileSwitchview(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
@@ -72,12 +71,13 @@ public:
     LRESULT OnFileExit(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
     LRESULT OnAbout(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 
+    // REFACTOR/wolfreak99: Eventually these should be moved to the SysTray class
     LRESULT OnSystemTrayIcon(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
     LRESULT OnTrayMenuShowHide(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
     LRESULT OnTrayMenuExit(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 
     void ShowOrHideWindow();
-    void ShowSystemTrayIcon();
-    void HideSystemTrayIcon();
     bool IsWindowOpen();
+    LRESULT Quit();
+
 };
