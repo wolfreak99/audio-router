@@ -18,23 +18,28 @@ struct global_routing_params
     uint64_t next_global_ptr;
 };
 
-void free(global_routing_params*);
-void serialize(const global_routing_params*, unsigned char* buffer);
-size_t global_size(const global_routing_params* global, bool struct_size = false);
+void free(global_routing_params *);
+void serialize(const global_routing_params *, unsigned char *buffer);
+size_t global_size(const global_routing_params *global, bool struct_size = false);
 
-static global_routing_params* rebase(unsigned char* blob)
+static global_routing_params* rebase(unsigned char *blob)
 {
-    for(global_routing_params* next = (global_routing_params*)blob;
+    for (global_routing_params *next = (global_routing_params *)blob;
         next != NULL;
-        next = (global_routing_params*)next->next_global_ptr)
+        next = (global_routing_params *)next->next_global_ptr)
     {
-        if(next->module_name_ptr)
+        if (next->module_name_ptr) {
             next->module_name_ptr += (DWORD_PTR)blob;
-        if(next->local.device_id_ptr)
+        }
+
+        if (next->local.device_id_ptr) {
             next->local.device_id_ptr += (DWORD_PTR)blob;
-        if(next->next_global_ptr)
+        }
+
+        if (next->next_global_ptr) {
             next->next_global_ptr += (DWORD_PTR)blob;
+        }
     }
 
-    return (global_routing_params*)blob;
-}
+    return (global_routing_params *)blob;
+} // rebase

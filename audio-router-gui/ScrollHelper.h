@@ -1,4 +1,5 @@
 // Filename: ScrollHelper.h
+
 // S.Chan, 01 Jul 2005
 
 #ifndef SCROLL_HELPER_INCLUDED
@@ -7,18 +8,19 @@
 #include "wtl.h"
 
 #if _MSC_VER > 1000
-#pragma once
+# pragma once
 #endif // _MSC_VER > 1000
 
-class CScrollHelper
-{
+class CScrollHelper {
     typedef CWindow CWnd;
+
 public:
+
     CScrollHelper();
     ~CScrollHelper();
 
     // Attach/detach a CWnd or CDialog.
-    void   AttachWnd(CWnd* pWnd);
+    void   AttachWnd(CWnd *pWnd);
     void   DetachWnd();
 
     // Set/get the virtual display size. When the dialog or window
@@ -40,18 +42,23 @@ public:
     void   ScrollToOrigin(bool scrollLeft, bool scrollTop);
 
     // Message handling.
-    void   OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
-    void   OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
+    void   OnHScroll(UINT nSBCode, UINT nPos, CScrollBar *pScrollBar);
+    void   OnVScroll(UINT nSBCode, UINT nPos, CScrollBar *pScrollBar);
     BOOL   OnMouseWheel(UINT nFlags, short zDelta, CPoint pt);
     void   OnSize(UINT nType, int cx, int cy);
 
 private:
-    int    Get32BitScrollPos(int bar, CScrollBar* pScrollBar);
-    void   UpdateScrollInfo();
-    void   UpdateScrollBar(int bar, int windowSize, int displaySize,
-                           LONG& pageSize, LONG& scrollPos, LONG& deltaPos);
 
-    CWnd*  m_attachWnd;
+    int    Get32BitScrollPos(int bar, CScrollBar *pScrollBar);
+    void   UpdateScrollInfo();
+    void   UpdateScrollBar(int bar,
+        int windowSize,
+        int displaySize,
+        LONG& pageSize,
+        LONG& scrollPos,
+        LONG& deltaPos);
+
+    CWnd *m_attachWnd;
     CSize  m_pageSize;
     CSize  m_displaySize;
     CSize  m_scrollPos;
