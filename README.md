@@ -6,15 +6,18 @@ I apologise if you encounter any bugs while using this program. Any that existed
 
 I do not yet have any changelog at the moment, I plan to add one, but i will do that after a few days of tweaking and cleaning up the code. If you want to see a semi-alternative changelog, just check the commit history inside the develop branch. You can also download a build of the develop branch using appveyor below
 
-(Appveyor still being configured, please check back here later for a link)
+[![Build status](https://ci.appveyor.com/api/projects/status/kdk2mexxolw3mpo9?svg=true)](https://ci.appveyor.com/project/wolfreak99/audio-router)
 
 For now, the main visible difference between this fork and the original is a system tray icon included.
 
 The branches are:
 
 develop: this is the branch that all commits are distributed on.
+
 open: this is the default branch of audiorouterdev's repo, all code in this branch was prior to me taking over, and will remain there for a nice walk down memory lane or something.
+
 Any other branches are personal branches.
+
 Contributing
 
 I am open to any contributions. If you have any questions, feel free to leave an issue, comment, whatever you want, and I will do my best to get back to you as soon as I can.
