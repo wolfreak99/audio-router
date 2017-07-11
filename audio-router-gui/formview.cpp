@@ -81,7 +81,7 @@ void formview::refresh_list()
 
     this->listview_m.DeleteAllItems();
 
-    // TODO: a new process might have same id
+    // TODO/audiorouterdev: a new process might have same id
     size_t found_items = 0;
 
     for (app_list::apps_t::iterator it = this->compatible_apps.apps.begin();
@@ -174,7 +174,7 @@ void formview::open_dialog()
         // {
         //    if(forced)
         //    {
-        //        // TODO: remove force if user decides to route it
+        //        // TODO/audiorouterdev: remove force if user decides to route it
         //        this->begin(app_info);
         //        // set names
         //        endpointdevice_friendlyname = L"(delayed until application restart)";
@@ -195,7 +195,7 @@ void formview::open_dialog()
         // }
 
         // //this->listview_m.SetItemText(item.iItem, 1, endpointdevice_friendlyname.c_str());
-        // // TODO: refactor the partial union
+        // // TODO/audiorouterdev: refactor the partial union
         // this->routed_processes[app.id].first = endpointdevice_friendlyname;
         // this->routed_processes[app.id].second = app.x86;
         // this->refresh_list();
@@ -223,7 +223,7 @@ void formview::open_dialog()
 
         this->listview_m.SetItemText(item.iItem, 1, endpointdevice_friendlyname.c_str());
 
-        // TODO: refactor the partial union
+        // TODO/audiorouterdev: refactor the partial union
         this->routed_processes[app.id].first = endpointdevice_friendlyname;
         this->routed_processes[app.id].second = app.x86;
     }

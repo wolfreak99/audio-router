@@ -116,7 +116,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 #ifdef ENABLE_BOOTSTRAP
     std::unique_ptr<bootstrapper> bootstrap;
     try {
-        // TODO: decide if create a dummy bootstapper in case if the initialization fails
+        // TODO/audiorouterdev: decide if create a dummy bootstapper in case if the initialization fails
         bootstrap.reset(new bootstrapper);
     }
     catch (std::wstring err) {

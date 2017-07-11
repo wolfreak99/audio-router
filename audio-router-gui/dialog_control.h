@@ -97,7 +97,7 @@ private:
 
 public:
 
-    // TODO: contorller embedded in this class
+    // TODO/audiorouterdev: contorller embedded in this class
     std::unique_ptr<Gdiplus::Bitmap> img;
 
     // as pixels

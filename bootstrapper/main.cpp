@@ -110,7 +110,7 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
         }
     }
     else if (fdwReason == DLL_PROCESS_DETACH) {
-        // TODO: remove
+        // TODO/audiorouterdev: remove
         patch_ntcreateuserprocess->lock();
         patch_ntcreateuserprocess->revert();
         is_patched = false;
@@ -138,7 +138,7 @@ NTSTATUS NTAPI ntcreateuserprocess_patch(PHANDLE ProcessHandle,
     // in the context of any other than the app information process(elevation handler)
     // the integrity level will be same or less
 
-    // TODO: handle unicode string properly
+    // TODO/audiorouterdev: handle unicode string properly
     bool in_list = false;
     CHandle hfile(OpenFileMappingW(FILE_MAP_READ | READ_CONTROL,
             FALSE,
@@ -223,11 +223,11 @@ NTSTATUS NTAPI ntcreateuserprocess_patch(PHANDLE ProcessHandle,
         }
     }
 
-    // TODO: copy code of ntcreateuserprocess and call there(guarantees no race conditions)
-    // TODO: make this process faster by omitting do exe delegation in certain cases
+    // TODO/audiorouterdev: copy code of ntcreateuserprocess and call there(guarantees no race conditions)
+    // TODO/audiorouterdev: make this process faster by omitting do exe delegation in certain cases
 
     // revert holds lock until apply;
-    // TODO: reverting process is atomic
+    // TODO/audiorouterdev: reverting process is atomic
     patch_ntcreateuserprocess->lock();
     patch_ntcreateuserprocess->revert();
 
@@ -238,7 +238,7 @@ NTSTATUS NTAPI ntcreateuserprocess_patch(PHANDLE ProcessHandle,
     patch_ntcreateuserprocess->apply();
     patch_ntcreateuserprocess->unlock();
 
-    // TODO: this might add a lot of overhead to createprocess routine
+    // TODO/audiorouterdev: this might add a lot of overhead to createprocess routine
     if (status == 0 && hpipe && ProcessHandle && ThreadHandle) {
         DWORD pid = GetProcessId(*ProcessHandle), tid = GetThreadId(*ThreadHandle);
 

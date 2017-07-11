@@ -409,8 +409,7 @@ dialog_control * dialog_array::create_control(DWORD pid,
 
 bool dialog_array::delete_control(DWORD pid, bool reposition)
 {
-    // TODO: deleting control unsafe because the dialog proc might have a blocking
-    // procedure running
+    // TODO/audiorouterdev: deleting control unsafe because the dialog proc might have a blocking procedure running
     dialog_controls_t::iterator it = this->find_control_it(pid);
 
     if (it != this->dialog_controls.end()) {
@@ -606,7 +605,7 @@ DWORD dialog_array::get_audio_session_control(IAudioSessionControl *in, IAudioSe
         return 0;
     }
 
-    // TODO: decide if show dummy dialog control if audio control of session fails
+    // TODO/audiorouterdev: decide if show dummy dialog control if audio control of session fails
     DWORD pid;
     HRESULT hr = (*out)->GetProcessId(&pid);
 
@@ -637,7 +636,7 @@ void dialog_array::choose_array_and_create_control(IAudioSessionControl *pSessio
     pSessionControl->Release();
 
     if (pid == 0) {
-        // TODO: decide if show dummy session
+        // TODO/audiorouterdev: decide if show dummy session
         return;
     }
 
@@ -712,7 +711,7 @@ void dialog_array::choose_array_and_create_control(IAudioSessionControl *pSessio
 
 LRESULT dialog_array::OnSessionCreated(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
-    // TODO: default audio device will be renamed to unmanaged apps in future
+    // TODO/audiorouterdev: default audio device will be renamed to unmanaged apps in future
     if (wParam == NULL && lParam != NULL) {
         dialog_control *control = (dialog_control *)lParam;
 
@@ -776,10 +775,10 @@ LRESULT dialog_array::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL
     // this->SetWindowPos(NULL, 0, 0, rc.right + 100, rc.bottom, SWP_NOZORDER);
 
     // set splitter
-    // TODO: set splitter the same way groupbox is set
+    // TODO/audiorouterdev: set splitter the same way groupbox is set
     RECT ctrl_splitter_rc;
 
-    // TODO: delete the additional -2's from here
+    // TODO/audiorouterdev: delete the additional -2's from here
     ctrl_splitter_rc.left = rc.right /* - 2*/;
     ctrl_splitter_rc.right = rc.right + 1 /* - 2*/;
     this->ctrl_image.GetWindowRect(&rc);

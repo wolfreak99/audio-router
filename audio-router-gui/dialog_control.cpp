@@ -187,7 +187,7 @@ public:
         BOOL NewMute,
         LPCGUID EventContext)
     {
-        // TODO: change the controller's slider position and
+        // TODO/audiorouterdev: change the controller's slider position and
         // possibly change the audio of all sessions in this controller
         return S_OK;
     }
@@ -208,7 +208,7 @@ public:
     HRESULT STDMETHODCALLTYPE OnStateChanged(AudioSessionState NewState)
     {
         // wasapi does not fire events properly
-        // // TODO: remove session from controller if state has changed to expired
+        // // TODO/audiorouterdev: remove session from controller if state has changed to expired
         // if(NewState == AudioSessionStateExpired)
         // {
         //    OutputDebugStringW(L"session expired\n");
@@ -226,7 +226,7 @@ public:
         //            {
         //                parent.audio_sessions.erase(it);
         //                (*it)->Release();
-        //                // TODO: reposition should reposition its parent too
+        //                // TODO/audiorouterdev: reposition should reposition its parent too
         //                parent.parent.reposition_dialog_controls();
         //                parent.parent.parent.reposition_dialog_arrays();
         //                return S_OK;
@@ -253,7 +253,7 @@ public:
 
     HRESULT STDMETHODCALLTYPE OnSessionDisconnected(AudioSessionDisconnectReason DisconnectReason)
     {
-        // TODO: remove session
+        // TODO/audiorouterdev: remove session
         return S_OK;
     }
 };
@@ -552,7 +552,7 @@ void dialog_control::delete_audio_sessions()
 
 void dialog_control::set_volume(int level, bool set)
 {
-    // TODO: set mute state when creating controls and arrays;
+    // TODO/audiorouterdev: set mute state when creating controls and arrays;
     // decide how to indicate/handle mixed state sessions
 
     if (level > 100) {
@@ -599,7 +599,7 @@ void dialog_control::set_mute(bool mute)
 
 void dialog_control::do_route(bool duplication)
 {
-    // TODO: decide if update the pid of sessions here
+    // TODO/audiorouterdev: decide if update the pid of sessions here
 
     input_dialog input_dlg(duplication);
 

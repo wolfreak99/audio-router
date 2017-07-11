@@ -63,7 +63,7 @@ DWORD delegation::pipe_listener_proc(LPVOID arg)
                 assert(b);
                 assert(written == OUTPUT_SIZE);
 
-                // TODO: limit messagebox to 1 instance
+                // TODO/audiorouterdev: limit messagebox to 1 instance
                 err += L"Routing functionality couldn't be initialized in the starting process.";
                 MessageBox(NULL, err.c_str(), NULL, MB_ICONERROR);
             }

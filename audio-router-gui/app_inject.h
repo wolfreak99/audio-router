@@ -4,8 +4,8 @@
 #include <vector>
 #include <string>
 
-// TODO: standardize flags for inject dll
-// TODO: change the order of parameters in inject dll
+// TODO/audiorouterdev: standardize flags for inject dll
+// TODO/audiorouterdev: change the order of parameters in inject dll
 
 class app_inject {
 public:
@@ -19,7 +19,7 @@ public:
     static void clear_devices(devices_t&);
 
     // throws formatted last error message
-    // TODO: use both as flag parameter
+    // TODO/audiorouterdev: use both as flag parameter
     static void inject_dll(DWORD id, bool x86, DWORD tid = 0, DWORD flags = 0);
     static DWORD get_session_guid_and_flag(bool duplicate, bool saved_routing = false);
 

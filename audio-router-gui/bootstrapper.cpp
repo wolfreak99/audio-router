@@ -13,11 +13,10 @@
 #endif
 #define VERSION 0
 
-// TODO: in future, audio router adds all apps that create sessions to a list
-// in a hashed form
-// TODO: a list that shows all apps that will be automatically routed
+// TODO/audiorouterdev: in future, audio router adds all apps that create sessions to a list in a hashed form
+// TODO/audiorouterdev: a list that shows all apps that will be automatically routed
 
-// TODO: in future, apps that route audio are prompted to restart
+// TODO/audiorouterdev: in future, apps that route audio are prompted to restart
 // so audio router can manage the stream;
 // the stream won't appear in the default device list when it's managed
 
@@ -204,7 +203,7 @@ void bootstrapper::save_routing(DWORD pid, IMMDevice *dev)
         dev->GetId(&id);
     }
 
-    // TODO: saved routing session guid might conflict with explicit session guid
+    // TODO/audiorouterdev: saved routing session guid might conflict with explicit session guid
     global_routing_params new_routing_params;
     new_routing_params.version = VERSION;
     new_routing_params.module_name_ptr = (uint64_t)path;
@@ -239,7 +238,7 @@ void bootstrapper::save_routing(DWORD pid, IMMDevice *dev)
     }
     CoTaskMemFree(id);
 
-    // TODO: file mapping should not signal whether implicit arguments are available or not
+    // TODO/audiorouterdev: file mapping should not signal whether implicit arguments are available or not
     this->load_local_implicit_params(false);
 } // save_routing
 
@@ -266,7 +265,7 @@ void bootstrapper::update_save()
     this->implicit_params.Close();
     this->local_file.Close();
 
-    // TODO: do not loop infinitely
+    // TODO/audiorouterdev: do not loop infinitely
     do {
         this->local_file = CHandle(NULL);
         this->local_file.Attach(CreateFile(LOCAL_PARAMS_FILE, GENERIC_READ | GENERIC_WRITE,
@@ -363,7 +362,7 @@ bootstrapper::bootstrapper(HWND hwnd) : available(false), hwnd(hwnd), routing_pa
     this->load_local_implicit_params();
     this->delegator.reset(new delegation);
 
-    // TODO: explorer exe should be identified with path
+    // TODO/audiorouterdev: explorer exe should be identified with path
     app_list list;
     app_list::filters_t filters;
     SET_FILTERS()
@@ -392,7 +391,7 @@ bootstrapper::~bootstrapper()
     }
 
     if (this->available) {
-        // TODO: explorer exe should be identified with path
+        // TODO/audiorouterdev: explorer exe should be identified with path
         app_list list;
         app_list::filters_t filters;
         SET_FILTERS()

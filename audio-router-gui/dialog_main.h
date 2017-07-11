@@ -12,7 +12,7 @@ class window;
 #define IDD_TIMER 1
 #define TIMER_INTERVAL 1000
 
-// TODO: register listener for device events in dialog_main
+// TODO/audiorouterdev: register listener for device events in dialog_main
 
 class dialog_main : public CDialogImpl<dialog_main>{
 public:

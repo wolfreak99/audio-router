@@ -3,7 +3,7 @@
 // #include "..\audio-router-gui\app_inject.h"
 #include <string>
 
-// TODO: standardization of error codes between app inject and do
+// TODO/audiorouterdev: standardization of error codes between app inject and do
 
 #ifndef _WIN64
 
@@ -61,7 +61,7 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
         return CUSTOM_ERR(0);
     }
 
-    // TODO: refactor folder parameter since it is present in argv[0]
+    // TODO/audiorouterdev: refactor folder parameter since it is present in argv[0]
     // localfree not issued on argv on purpose
     LPTSTR strpid = argv[1];
     std::wstring dll = argv[2]; // folder

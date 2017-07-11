@@ -77,9 +77,8 @@ void dialog_main::reposition_dialog_arrays()
         (*it)->SetWindowPos(
             NULL, rc.left, rc.top, 0, 0, SWP_NOZORDER | SWP_SHOWWINDOW | SWP_NOSIZE);
 
-        // --- workaround for groupbox not showing properly on top of dialog controls
-        // in dialog array view ---
-        // TODO: clipping occured because in child dialog ws_clipchildren was set in
+        // HACK/audiorouterdev: workaround for groupbox not showing properly on top of dialog controls in dialog array view ---
+        // TODO/audiorouterdev: clipping occured because in child dialog ws_clipchildren was set in
         // dlgresize_init function
         (*it)->GetWindowRect(&rc4);
         this->ScreenToClient(&rc4);

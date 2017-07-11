@@ -1,7 +1,7 @@
 #pragma once
 #include <Audioclient.h>
 
-// TODO: iaudioclockadjustment implementation for adjusting sample rate
+// TODO/audiorouterdev: iaudioclockadjustment implementation for adjusting sample rate
 
 template <typename T> struct duplicate
 {

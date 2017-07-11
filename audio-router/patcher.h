@@ -4,7 +4,7 @@
 #include <type_traits>
 #include <stdint.h>
 
-// TODO: atomicity mus be implemented with short jmp to code path in 2gb address space
+// TODO/audiorouterdev: atomicity mus be implemented with short jmp to code path in 2gb address space
 // that will jump to the patched function in the 64 space
 
 template <typename T> class patcher {

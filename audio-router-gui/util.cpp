@@ -6,7 +6,7 @@
 
 void throw_errormessage(DWORD errorcode)
 {
-    // TODO: add error message table resource
+    // TODO/audiorouterdev: add error message table resource
     if (errorcode & (1 << 29)) {
         // custom err
         errorcode &= ~(1 << 29);
@@ -26,7 +26,7 @@ void throw_errormessage(DWORD errorcode)
                 L"Initialization of audio routing functionality in target process failed.\n");
         case 3:
             throw std::wstring(L"Target process did not respond in time.\n");
-        case 4: // TODO: obsolete
+        case 4: // TODO/audiorouterdev: obsolete
             throw std::wstring(L"Could not open target process.\n");
         default:
             throw std::wstring(L"Unknown user-defined error.\n");
@@ -60,7 +60,7 @@ void throw_errormessage(DWORD errorcode)
     }
 } // throw_errormessage
 
-// TODO: create security descriptor for the lowest integrity level
+// TODO/audiorouterdev: create security descriptor for the lowest integrity level
 
 security_attributes::security_attributes(DWORD permissions,
     object_t object) : everyone(NULL), packages(NULL), dacl(NULL), sacl_psd(NULL), psd(NULL),

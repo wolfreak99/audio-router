@@ -78,7 +78,7 @@ public:
 
     void set_device(device_t device, const std::wstring& device_name);
 
-    // TODO: rename to initialize
+    // TODO/audiorouterdev: rename to initialize
     void refresh_dialog_controls();
     void reposition_dialog_controls();
 

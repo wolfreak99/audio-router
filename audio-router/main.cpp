@@ -10,7 +10,7 @@
 
 #pragma comment(lib, "uuid.lib")
 
-// TODO: unify constants and structures between dll and gui
+// TODO/audiorouterdev: unify constants and structures between dll and gui
 #define ROUTING_MASK (((DWORD)0x3) << (sizeof(DWORD) * 8 - 2))
 #define SESSION_MASK ((~((DWORD)0)) >> 2)
 #define GET_ROUTING_FLAG(a) (a >> (sizeof(DWORD) * 8 - 2))
@@ -47,7 +47,7 @@ CRITICAL_SECTION CriticalSection;
 DWORD session_flag;
 device_id_duplicate *device_ids = NULL;
 
-// TODO: streamline device id parameter applying
+// TODO/audiorouterdev: streamline device id parameter applying
 
 // FALSE ret val will decrement the ref count
 // TRUE ret val will keep the dll
@@ -98,8 +98,8 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
         apply_explicit_routing();
     }
     else if (fdwReason == DLL_PROCESS_DETACH) {
-        // TODO: include critical sections in the patcher
-        // TODO: decide if delete device id str(practically does not have any effect)
+        // TODO/audiorouterdev: include critical sections in the patcher
+        // TODO/audiorouterdev: decide if delete device id str(practically does not have any effect)
         // (patches are automatically reverted)
         DeleteCriticalSection(&CriticalSection);
     }
@@ -299,7 +299,7 @@ HRESULT __stdcall activate_patch(IMMDevice *this_,
             return hr;
         }
 
-        // TODO: device id might be invalid in case if the endpoint has been disconnected
+        // TODO/audiorouterdev: device id might be invalid in case if the endpoint has been disconnected
 
         /*if(cont)
             MessageBoxA(
@@ -399,7 +399,7 @@ HRESULT __stdcall activate_patch(IMMDevice *this_,
 
         pDevice = pEndpoint;
 
-        // TODO: device id might be invalid in case if the endpoint has been disconnected
+        // TODO/audiorouterdev: device id might be invalid in case if the endpoint has been disconnected
         if (cont) {
             MessageBoxA(
                 NULL, "Endpoint device was not found during routing process.",
