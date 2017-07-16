@@ -183,9 +183,7 @@ public:
         return S_OK;
     }
 
-    HRESULT STDMETHODCALLTYPE OnSimpleVolumeChanged(float NewVolume,
-        BOOL NewMute,
-        LPCGUID EventContext)
+    HRESULT STDMETHODCALLTYPE OnSimpleVolumeChanged(float NewVolume, BOOL NewMute, LPCGUID EventContext)
     {
         // TODO/audiorouterdev: change the controller's slider position and
         // possibly change the audio of all sessions in this controller
@@ -273,12 +271,8 @@ BOOL CALLBACK EnumWindowsProcMy(HWND hwnd, LPARAM lParam)
     return TRUE;
 }
 
-LRESULT CALLBACK MenuButtonProc(HWND hWnd,
-    UINT uMsg,
-    WPARAM wParam,
-    LPARAM lParam,
-    UINT_PTR uIdSubclass,
-    DWORD_PTR dwRefData)
+LRESULT CALLBACK MenuButtonProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, 
+    UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
 {
     // http://poiru.net/2012/06/17/win32-menu-button
     switch (uMsg) {
@@ -314,13 +308,10 @@ LRESULT CALLBACK MenuButtonProc(HWND hWnd,
     return DefSubclassProc(hWnd, uMsg, wParam, lParam);
 } // MenuButtonProc
 
-dialog_control::dialog_control(dialog_array& parent,
-    DWORD pid) : pid(pid), width(DLG_CONTROL_WIDTH), height(DLG_CONTROL_HEIGHT),
-                 routing_state(NO_STATE), x86(true),
-                 parent(parent), muted(false), duplicating(false),
-                 icon(NULL), ctrl_slider(*this),
-                 peak_meter_value(0.0f), peak_meter_velocity(0.0f),
-                 managed(false)
+dialog_control::dialog_control(dialog_array& parent, DWORD pid)
+    : pid(pid), width(DLG_CONTROL_WIDTH), height(DLG_CONTROL_HEIGHT), routing_state(NO_STATE), 
+     x86(true), parent(parent), muted(false), duplicating(false), icon(NULL), ctrl_slider(*this),
+     peak_meter_value(0.0f), peak_meter_velocity(0.0f), managed(false)
 {
     // acquire handle so the pid won't be invalidated until this is destroyed
     this->handle_process = OpenProcess(PROCESS_ALL_ACCESS, FALSE, this->pid);
@@ -667,8 +658,7 @@ LRESULT dialog_control::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lParam, BO
     this->ctrl_image = this->GetDlgItem(IDC_IMAGE);
     this->ctrl_slider.SubclassWindow(this->GetDlgItem(IDC_SLIDER1));
     this->ctrl_static = this->GetDlgItem(IDC_STATIC1);
-    this->ctrl_static.SetWindowLongW(
-        GWL_STYLE, (this->ctrl_static.GetWindowLongW(GWL_STYLE) | SS_OWNERDRAW));
+    this->ctrl_static.SetWindowLongW(GWL_STYLE, (this->ctrl_static.GetWindowLongW(GWL_STYLE) | SS_OWNERDRAW));
     this->ctrl_group.ShowWindow(SW_HIDE);
     SetWindowSubclass(this->ctrl_button, MenuButtonProc, NULL, NULL);
     this->ctrl_slider.dlg_parent = *this;
@@ -724,10 +714,7 @@ LRESULT dialog_control::OnCtrlColor(UINT uMsg, WPARAM wParam, LPARAM lParam, BOO
     return (LRESULT)AtlGetStockBrush(WHITE_BRUSH);
 }
 
-LRESULT dialog_control::OnBnClickedButton(WORD /*wNotifyCode*/,
-    WORD /*wID*/,
-    HWND /*hWndCtl*/,
-    BOOL& /*bHandled*/)
+LRESULT dialog_control::OnBnClickedButton(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
 {
     RECT rc;
 
@@ -772,10 +759,7 @@ LRESULT dialog_control::OnPopupMute(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*h
     return 0;
 }
 
-LRESULT dialog_control::OnPopupDuplicate(WORD /*wNotifyCode*/,
-    WORD /*wID*/,
-    HWND /*hWndCtl*/,
-    BOOL& /*bHandled*/)
+LRESULT dialog_control::OnPopupDuplicate(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
 {
     this->do_route(true);
     return 0;

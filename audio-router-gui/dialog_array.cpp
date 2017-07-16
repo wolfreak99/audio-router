@@ -878,10 +878,7 @@ LRESULT dialog_array::OnDestroy(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& b
     return 0;
 }
 
-LRESULT dialog_array::OnBnClickedButton1(WORD /*wNotifyCode*/,
-    WORD /*wID*/,
-    HWND /*hWndCtl*/,
-    BOOL& /*bHandled*/)
+LRESULT dialog_array::OnBnClickedButton1(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
 {
     if (this->audio_volume != NULL) {
         BOOL mute;
