@@ -116,10 +116,11 @@ DWORD bootstrap(DWORD pid, DWORD tid, const std::wstring& folder, bool both)
         return GetLastError();
     }
 
-    //
-    // http://reverseengineering.stackexchange.com/questions/8086/changing-start-address-of-thread-using-combination-of-get-and-setthreadcontext
-    // http://www.exploit-monday.com/2012/04/64-bit-process-replacement-in.html
-    // get & set entrypoint
+    /* 
+     * http://reverseengineering.stackexchange.com/questions/8086/changing-start-address-of-thread-using-combination-of-get-and-setthreadcontext
+     * http://www.exploit-monday.com/2012/04/64-bit-process-replacement-in.html
+     * get & set entrypoint
+     */
     CONTEXT ctx;
     LPVOID entrypoint;
     ctx.ContextFlags = CONTEXT_INTEGER;
