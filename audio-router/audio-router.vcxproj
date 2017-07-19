@@ -159,6 +159,7 @@
     <ClCompile Include="patch_iaudiostreamvolume.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="common.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="patch.h" />
     <ClInclude Include="patcher.h" />
