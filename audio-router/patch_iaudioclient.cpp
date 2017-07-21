@@ -360,22 +360,21 @@ void patch_iaudioclient(IAudioClient *this_, LPGUID session_guid)
 
     // patch routines
     DWORD_PTR *vftptr = ((DWORD_PTR **)this_)[0];
-    vftptr[10] = (DWORD_PTR)start_patch;
-    vftptr[14] = (DWORD_PTR)getservice_patch;
-    vftptr[11] = (DWORD_PTR)stop_patch;
+    // vftptr[0] = (DWORD_PTR)queryinterface_patch; // NEW
+    // NOTE/wolfreak99: some reason index 1 is missing.
+    vftptr[2] = (DWORD_PTR)release_patch;
     vftptr[3] = (DWORD_PTR)initialize_patch;
     vftptr[4] = (DWORD_PTR)getbuffersize_patch;
-    vftptr[6] = (DWORD_PTR)getcurrentpadding_patch;
-    vftptr[13] = (DWORD_PTR)seteventhandle_patch;
     vftptr[5] = (DWORD_PTR)getstreamlatency_patch;
+    vftptr[6] = (DWORD_PTR)getcurrentpadding_patch;
+    vftptr[7] = (DWORD_PTR)isformatsupported_patch; // static
     vftptr[8] = (DWORD_PTR)getmixformat_patch; // static
     vftptr[9] = (DWORD_PTR)getdeviceperiod_patch; // static
+    vftptr[10] = (DWORD_PTR)start_patch;
+    vftptr[11] = (DWORD_PTR)stop_patch;
     vftptr[12] = (DWORD_PTR)reset_patch;
-    vftptr[7] = (DWORD_PTR)isformatsupported_patch; // static
-    vftptr[2] = (DWORD_PTR)release_patch;
-
-    // vftptr[0] = (DWORD_PTR)queryinterface_patch; // NEW
-
+    vftptr[13] = (DWORD_PTR)seteventhandle_patch;
+    vftptr[14] = (DWORD_PTR)getservice_patch;
     vftptr[15] = (DWORD_PTR)old_vftptr;
     vftptr[16] = (DWORD_PTR)dup;
     vftptr[17] = (DWORD_PTR)session_guid;
