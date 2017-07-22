@@ -175,6 +175,7 @@ bool apply_explicit_routing()
 } // apply_explicit_routing
 
 
+
 HRESULT __stdcall activate_patch(IMMDevice *this_, REFIID iid, DWORD dwClsCtx,  PROPVARIANT *pActivationParams, void **ppInterface)
 {
     EnterCriticalSection(&CriticalSection);
@@ -350,10 +351,10 @@ HRESULT __stdcall activate_patch(IMMDevice *this_, REFIID iid, DWORD dwClsCtx,  
             continue;
         }
 
-        bool cont = true;
+        bool endpoint_found = false;
         IMMDevice *pEndpoint = NULL;
 
-        for (ULONG i = 0; i < count && cont; i++) {
+        for (ULONG i = 0; i < count && !endpoint_found; i++) {
             LPWSTR pwszID;
 
             pDevices->Item(i, &pEndpoint);
@@ -362,12 +363,12 @@ HRESULT __stdcall activate_patch(IMMDevice *this_, REFIID iid, DWORD dwClsCtx,  
             pEndpoint->GetId(&pwszID);
 
             if (wcscmp(next->proxy->device_id_str, pwszID) == 0) {
-                cont = false;
+                endpoint_found = true;
             }
 
             CoTaskMemFree(pwszID);
 
-            if (cont) {
+            if (!endpoint_found) {
                 pEndpoint->Release();
             }
         }
@@ -375,40 +376,31 @@ HRESULT __stdcall activate_patch(IMMDevice *this_, REFIID iid, DWORD dwClsCtx,  
         pDevice = pEndpoint;
 
         // TODO/audiorouterdev: device id might be invalid in case if the endpoint has been disconnected
-        if (cont) {
-            MessageBoxA(
-                NULL, "Endpoint device was not found during routing process.",
-                NULL, MB_ICONERROR);
-        }
-
-        if (!cont &&
-            pDevice->Activate(iid, dwClsCtx, pActivationParams, (void **)&pAudioClient) != S_OK)
-        {
-            SAFE_RELEASE(pAudioClient);
-            pDevice->Release();
+        if (!endpoint_found) {
+            MessageBoxA(NULL, "Endpoint device was not found during routing process.", NULL, MB_ICONERROR);
             pDevices->Release();
             pEnumerator->Release();
             continue;
         }
+        else {
+            // Device found, attempt to activate it.
+            if (pDevice->Activate(iid, dwClsCtx, pActivationParams, (void **)&pAudioClient) != S_OK) {
+                SAFE_RELEASE(pAudioClient);
+                continue;
+            }
+            else {
+                /*GUID* guid = new GUID;
+                ZeroMemory(guid, sizeof(GUID));
+                const DWORD session_guid = session_flag & SESSION_MASK;
+                size_t starting_byte = 7;
+                memcpy(((char*)guid) + starting_byte, &session_guid, sizeof(session_guid));*/
 
-        if (!cont) {
+                get_duplicate((IAudioClient *)*ppInterface)->add(pAudioClient);
+            }
             pDevice->Release();
+            pDevices->Release();
+            pEnumerator->Release();
         }
-
-        pDevices->Release();
-        pEnumerator->Release();
-
-        if (cont) {
-            continue;
-        }
-
-        /*GUID* guid = new GUID;
-           ZeroMemory(guid, sizeof(GUID));
-           const DWORD session_guid = session_flag & SESSION_MASK;
-           size_t starting_byte = 7;
-           memcpy(((char*)guid) + starting_byte, &session_guid, sizeof(session_guid));*/
-
-        get_duplicate((IAudioClient *)*ppInterface)->add(pAudioClient);
     }
 
     patch_activate.apply();
