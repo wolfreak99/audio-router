@@ -7,6 +7,7 @@
 #include "main.h"
 #include "patcher.h"
 #include "patch.h"
+#include "common.h"
 
 #pragma comment(lib, "uuid.lib")
 
@@ -16,12 +17,7 @@
 #define GET_ROUTING_FLAG(a) (a >> (sizeof(DWORD) * 8 - 2))
 
 #ifndef SAFE_RELEASE
-# define SAFE_RELEASE(x)\
-    if (x != NULL) {\
-        x->Release();\
-        x = NULL;\
-    }
-
+# define SAFE_RELEASE(x) assert(strcmp("main.cpp: SAFE_RELEASE is not defined, check if wtl.h access", "") == 0)
 #endif
 
 struct device_id_t
@@ -58,24 +54,17 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
         IMMDeviceEnumerator *pEnumerator;
         IMMDevice *pDevice;
 
-        hr = CoInitialize(NULL);
-
-        if (hr != S_OK) {
+        if ((hr = CoInitialize(NULL)) != S_OK) {
             return FALSE;
         }
 
-        hr = CoCreateInstance(
-            __uuidof(MMDeviceEnumerator), NULL,
-            CLSCTX_ALL, __uuidof(IMMDeviceEnumerator),
-            (void **)&pEnumerator);
-
-        if (hr != S_OK) {
+        if ((hr = CoCreateInstance(__uuidof(MMDeviceEnumerator), NULL, CLSCTX_ALL,
+            __uuidof(IMMDeviceEnumerator), (void **)&pEnumerator)) != S_OK)
+        {
             return FALSE;
         }
 
-        hr = pEnumerator->GetDefaultAudioEndpoint(eRender, eConsole, &pDevice);
-
-        if (hr != S_OK) {
+        if ((hr = pEnumerator->GetDefaultAudioEndpoint(eRender, eConsole, &pDevice)) != S_OK) {
             pEnumerator->Release();
             return FALSE;
         }
@@ -124,9 +113,7 @@ bool apply_parameters(const local_routing_params& params)
         EnterCriticalSection(&CriticalSection);
 
         patch_activate.revert();
-        delete device_ids;
-        device_ids = NULL;
-
+        SafeDelete(device_ids);
         LeaveCriticalSection(&CriticalSection);
 
         return true;
@@ -141,8 +128,7 @@ bool apply_parameters(const local_routing_params& params)
         std::wstring device_id;
 
         if (GET_ROUTING_FLAG(session_flag) == 1) {
-            delete device_ids;
-            device_ids = NULL;
+            SafeDelete(device_ids);
         }
 
         for (const wchar_t *p = (const wchar_t *)params.device_id_ptr; *p; p++) {
@@ -173,13 +159,11 @@ bool apply_parameters(const local_routing_params& params)
 bool apply_explicit_routing()
 {
     CHandle hfile(OpenFileMappingW(FILE_MAP_READ, FALSE, L"Local\\audio-router-file"));
-
     if (hfile == NULL) {
         return false;
     }
 
     unsigned char *buffer = (unsigned char *)MapViewOfFile(hfile, FILE_MAP_COPY, 0, 0, 0);
-
     if (buffer == NULL) {
         return false;
     }
@@ -190,11 +174,8 @@ bool apply_explicit_routing()
     return ret;
 } // apply_explicit_routing
 
-HRESULT __stdcall activate_patch(IMMDevice *this_,
-    REFIID iid,
-    DWORD dwClsCtx,
-    PROPVARIANT *pActivationParams,
-    void **ppInterface)
+
+HRESULT __stdcall activate_patch(IMMDevice *this_, REFIID iid, DWORD dwClsCtx,  PROPVARIANT *pActivationParams, void **ppInterface)
 {
     EnterCriticalSection(&CriticalSection);
     patch_activate.revert();
@@ -223,10 +204,8 @@ HRESULT __stdcall activate_patch(IMMDevice *this_,
         IMMDeviceCollection *pDevices = NULL;
         IMMDevice *pDevice = NULL;
 
-        if ((hr = CoCreateInstance(
-                    __uuidof(MMDeviceEnumerator), NULL,
-                    CLSCTX_INPROC_SERVER, __uuidof(IMMDeviceEnumerator),
-                    (void **)&pEnumerator)) != S_OK)
+        if ((hr = CoCreateInstance(__uuidof(MMDeviceEnumerator), NULL, CLSCTX_INPROC_SERVER, 
+            __uuidof(IMMDeviceEnumerator), (void **)&pEnumerator)) != S_OK)
         {
             SAFE_RELEASE(pEnumerator);
             patch_activate.apply();
@@ -234,9 +213,7 @@ HRESULT __stdcall activate_patch(IMMDevice *this_,
             return hr;
         }
 
-        if ((hr =
-                    pEnumerator->EnumAudioEndpoints(eRender, DEVICE_STATE_ACTIVE,
-                    &pDevices)) != S_OK) {
+        if ((hr = pEnumerator->EnumAudioEndpoints(eRender, DEVICE_STATE_ACTIVE, &pDevices)) != S_OK) {
             SAFE_RELEASE(pDevices);
             pEnumerator->Release();
             patch_activate.apply();
@@ -352,10 +329,8 @@ HRESULT __stdcall activate_patch(IMMDevice *this_,
         IMMDevice *pDevice = NULL;
         IAudioClient *pAudioClient = NULL;
 
-        if (CoCreateInstance(
-                __uuidof(MMDeviceEnumerator), NULL,
-                CLSCTX_INPROC_SERVER, __uuidof(IMMDeviceEnumerator),
-                (void **)&pEnumerator) != S_OK)
+        if (CoCreateInstance(__uuidof(MMDeviceEnumerator), NULL, CLSCTX_INPROC_SERVER,
+            __uuidof(IMMDeviceEnumerator), (void **)&pEnumerator) != S_OK)
         {
             SAFE_RELEASE(pEnumerator);
             continue;

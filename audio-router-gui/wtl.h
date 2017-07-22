@@ -10,6 +10,7 @@
 # define _WTL_USE_CSTRING
 #endif
 
+//TODO/wolfreak99: remove max/min from here if any of the "#include <atl*.h> do not rely on it, and use the ones in "audio-router/common.h"
 #ifndef max
 # define max(a, b) (((a) > (b)) ? (a) : (b))
 #endif
