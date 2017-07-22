@@ -223,7 +223,6 @@ HRESULT __stdcall activate_patch(IMMDevice *this_, REFIID iid, DWORD dwClsCtx,  
         }
 
         UINT count;
-
         if ((hr = pDevices->GetCount(&count)) != S_OK) {
             pDevices->Release();
             pEnumerator->Release();
@@ -234,15 +233,14 @@ HRESULT __stdcall activate_patch(IMMDevice *this_, REFIID iid, DWORD dwClsCtx,  
 
         LPWSTR dev_id = NULL;
         this_->GetId(&dev_id);
+
         bool endpoint_found = dev_id ? false : true;
-        IMMDevice *pEndpoint = NULL;
-
         for (ULONG i = 0; i < count; i++) {
-            LPWSTR pwszID;
-
+            IMMDevice *pEndpoint = NULL;
             pDevices->Item(i, &pEndpoint);
 
             // Get the endpoint ID string.
+            LPWSTR pwszID;
             pEndpoint->GetId(&pwszID);
 
             if (!pDevice && wcscmp(device_ids->proxy->device_id_str, pwszID) == 0) {
@@ -255,21 +253,14 @@ HRESULT __stdcall activate_patch(IMMDevice *this_, REFIID iid, DWORD dwClsCtx,  
             }
 
             CoTaskMemFree(pwszID);
-
-            if (!pDevice) {
-                pEndpoint->Release();
-            }
+            if (!pDevice) pEndpoint->Release();
         }
 
         CoTaskMemFree(dev_id);
 
         if (!endpoint_found) {
             HRESULT hr = this_->Activate(iid, dwClsCtx, pActivationParams, ppInterface);
-
-            if (pDevice) {
-                pDevice->Release();
-            }
-
+            SAFE_RELEASE(pDevice);
             pDevices->Release();
             pEnumerator->Release();
             patch_activate.apply();
@@ -287,13 +278,10 @@ HRESULT __stdcall activate_patch(IMMDevice *this_, REFIID iid, DWORD dwClsCtx,  
         if (!pDevice ||
             (hr = pDevice->Activate(iid, dwClsCtx, pActivationParams, ppInterface)) != S_OK)
         {
-            if (pDevice) {
-                pDevice->Release();
-            }
-            else {
+            if (!pDevice)
                 hr = AUDCLNT_E_DEVICE_INVALIDATED;
-            }
 
+            SAFE_RELEASE(pDevice);
             pDevices->Release();
             pEnumerator->Release();
             patch_activate.apply();
@@ -344,7 +332,6 @@ HRESULT __stdcall activate_patch(IMMDevice *this_, REFIID iid, DWORD dwClsCtx,  
         }
 
         UINT count;
-
         if (pDevices->GetCount(&count) != S_OK) {
             pDevices->Release();
             pEnumerator->Release();
@@ -353,13 +340,11 @@ HRESULT __stdcall activate_patch(IMMDevice *this_, REFIID iid, DWORD dwClsCtx,  
 
         bool endpoint_found = false;
         IMMDevice *pEndpoint = NULL;
-
         for (ULONG i = 0; i < count && !endpoint_found; i++) {
-            LPWSTR pwszID;
-
             pDevices->Item(i, &pEndpoint);
 
             // Get the endpoint ID string.
+            LPWSTR pwszID;
             pEndpoint->GetId(&pwszID);
 
             if (wcscmp(next->proxy->device_id_str, pwszID) == 0) {
@@ -367,7 +352,6 @@ HRESULT __stdcall activate_patch(IMMDevice *this_, REFIID iid, DWORD dwClsCtx,  
             }
 
             CoTaskMemFree(pwszID);
-
             if (!endpoint_found) {
                 pEndpoint->Release();
             }
