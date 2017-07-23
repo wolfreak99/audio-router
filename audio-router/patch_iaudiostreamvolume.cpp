@@ -4,7 +4,7 @@ DWORD_PTR* swap_vtable(IAudioStreamVolume *this_)
 {
     DWORD_PTR *old_vftptr = ((DWORD_PTR **)this_)[0];
 
-    ((DWORD_PTR **)this_)[0] = ((DWORD_PTR ***)this_)[0][8];
+    ((DWORD_PTR **)this_)[0] = ((DWORD_PTR ***)this_)[0][IAUDIOSTREAMVOLUME_VFTPTR_IND_OLD];
     return old_vftptr;
 }
 
@@ -29,7 +29,7 @@ HRESULT __stdcall release_patch(IAudioStreamVolume *this_)
 
 iaudiostreamvolume_duplicate* get_duplicate(IAudioStreamVolume *this_)
 {
-    return ((iaudiostreamvolume_duplicate ***)this_)[0][9];
+    return ((iaudiostreamvolume_duplicate ***)this_)[0][IAUDIOSTREAMVOLUME_VFTPTR_IND_DUP];
 }
 
 HRESULT __stdcall getchannelcount_patch(IAudioStreamVolume *this_, UINT32 *pdwCount)
@@ -50,9 +50,7 @@ HRESULT __stdcall getchannelcount_patch(IAudioStreamVolume *this_, UINT32 *pdwCo
     return hr;
 }
 
-HRESULT __stdcall setchannelvolume_patch(IAudioStreamVolume *this_,
-    UINT32 dwIndex,
-    const float fLevel)
+HRESULT __stdcall setchannelvolume_patch(IAudioStreamVolume *this_, UINT32 dwIndex, const float fLevel)
 {
     IAudioStreamVolume *proxy = get_duplicate(this_)->proxy;
     DWORD_PTR *old_vftptr = swap_vtable(this_);
@@ -87,9 +85,7 @@ HRESULT __stdcall getchannelvolume_patch(IAudioStreamVolume *this_, UINT32 dwInd
     return hr;
 }
 
-HRESULT __stdcall setallvolumes_patch(IAudioStreamVolume *this_,
-    UINT32 dwCount,
-    const float *pfVolumes)
+HRESULT __stdcall setallvolumes_patch(IAudioStreamVolume *this_, UINT32 dwCount, const float *pfVolumes)
 {
     IAudioStreamVolume *proxy = get_duplicate(this_)->proxy;
     DWORD_PTR *old_vftptr = swap_vtable(this_);
@@ -142,7 +138,7 @@ void patch_iaudiostreamvolume(IAudioStreamVolume *this_)
     DWORD_PTR *old_vftptr = ((DWORD_PTR **)this_)[0]; // save old virtual table
 
     // create new virtual table (slot for old table ptr and for duplicate)
-    ((DWORD_PTR **)this_)[0] = new DWORD_PTR[10];
+    ((DWORD_PTR **)this_)[0] = new DWORD_PTR[IAUDIOSTREAMVOLUME_VFTPTR_COUNT];
     memcpy(((DWORD_PTR **)this_)[0], old_vftptr, 8 * sizeof(DWORD_PTR));
 
     // create duplicate object
@@ -150,13 +146,12 @@ void patch_iaudiostreamvolume(IAudioStreamVolume *this_)
 
     // patch routines
     DWORD_PTR *vftptr = ((DWORD_PTR **)this_)[0];
-    vftptr[2] = (DWORD_PTR)release_patch;
-    vftptr[3] = (DWORD_PTR)getchannelcount_patch;
-    vftptr[4] = (DWORD_PTR)setchannelvolume_patch;
-    vftptr[5] = (DWORD_PTR)getchannelvolume_patch;
-    vftptr[6] = (DWORD_PTR)setallvolumes_patch;
-    vftptr[7] = (DWORD_PTR)getallvolumes_patch;
-
-    vftptr[8] = (DWORD_PTR)old_vftptr;
-    vftptr[9] = (DWORD_PTR)dup;
+    vftptr[IAUDIOSTREAMVOLUME_VFTPTR_IND_RELEASE]            = (DWORD_PTR)release_patch;
+    vftptr[IAUDIOSTREAMVOLUME_VFTPTR_IND_GET_CHANNEL_COUNT]  = (DWORD_PTR)getchannelcount_patch;
+    vftptr[IAUDIOSTREAMVOLUME_VFTPTR_IND_SET_CHANNEL_VOLUME] = (DWORD_PTR)setchannelvolume_patch;
+    vftptr[IAUDIOSTREAMVOLUME_VFTPTR_IND_GET_CHANNEL_VOLUME] = (DWORD_PTR)getchannelvolume_patch;
+    vftptr[IAUDIOSTREAMVOLUME_VFTPTR_IND_SET_ALL_VOLUMES]    = (DWORD_PTR)setallvolumes_patch;
+    vftptr[IAUDIOSTREAMVOLUME_VFTPTR_IND_GET_ALL_VOLUMES]    = (DWORD_PTR)getallvolumes_patch;
+    vftptr[IAUDIOSTREAMVOLUME_VFTPTR_IND_OLD]                = (DWORD_PTR)old_vftptr;
+    vftptr[IAUDIOSTREAMVOLUME_VFTPTR_IND_DUP]                = (DWORD_PTR)dup;
 } // patch_iaudiostreamvolume
