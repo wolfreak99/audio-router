@@ -194,14 +194,12 @@ void app_inject::inject_dll(DWORD pid, bool x86, DWORD tid, DWORD flags)
     // flag = 1: bootstrapper and audio router dll are implicitly loaded
     // flag = 2: bootstrapper is implicitly loaded
     // flag = 3: bootstrapper is explicitly loaded
-    assert(flags <= 3);
-    assert((flags && flags <= 2) ? tid : true);
+    assert(flags <= APP_INJECT_DLL_FLAG_BOOTSTRAPPER_EXPLICITLY_LOADED);
+    assert((flags && flags <= APP_INJECT_DLL_FLAG_BOOTSTRAPPER_IMPLICITLY_LOADED) ? tid : true);
     assert(pid);
 
     // retrieve the paths
-    WCHAR filepath[MAX_PATH] = {
-        0
-    };
+    WCHAR filepath[MAX_PATH] = {0};
     GetModuleFileName(NULL, filepath, MAX_PATH);
     CPath path(filepath);
     path.RemoveFileSpec();

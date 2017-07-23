@@ -4,7 +4,13 @@
 #include <vector>
 #include <string>
 
-// TODO/audiorouterdev: standardize flags for inject dll
+enum APP_INJECT_DLL_FLAG
+{
+    APP_INJECT_DLL_FLAG_AUDIO_ROUTER_EXPLICITLY_LOADED,
+    APP_INJECT_DLL_FLAG_BOOTSTRAPPER_AUDIO_ROUTER_IMPLICITLY_LOADED,
+    APP_INJECT_DLL_FLAG_BOOTSTRAPPER_IMPLICITLY_LOADED,
+    APP_INJECT_DLL_FLAG_BOOTSTRAPPER_EXPLICITLY_LOADED,
+};
 // TODO/audiorouterdev: change the order of parameters in inject dll
 
 class app_inject {
@@ -37,9 +43,5 @@ public:
     // device_index 0 is reserved for default device;
     // throws wstring;
     // duplication ignored on device_index 0
-    void inject(DWORD process_id,
-        bool x86,
-        size_t device_index,
-        flush_t flush,
-        bool duplicate = false);
+    void inject(DWORD process_id, bool x86, size_t device_index, flush_t flush, bool duplicate = false);
 };
