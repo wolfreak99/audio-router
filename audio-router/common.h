@@ -11,7 +11,7 @@
 #endif
 
 #define sgn(x)               ((x > 0) ? 1 : ((x < 0) ? -1 : 0))
-#define clamp(val,lo,hi)     (min(h, max(l, x)))
+#define clamp(val,lo,hi)     (min(hi, max(lo, val)))
 
 #if defined(_MSC_VER)
 #  define countof(arr)       _countof(arr)
