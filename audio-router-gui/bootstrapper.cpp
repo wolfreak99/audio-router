@@ -129,9 +129,7 @@ bool bootstrapper::is_saved_routing(DWORD pid, IMMDevice *dev) const
         dev->GetId(&id);
     }
 
-    WCHAR path[MAX_PATH] = {
-        0
-    };
+    WCHAR path[MAX_PATH] = {0};
 
     if (!get_path(pid, path, MAX_PATH)) {
         CoTaskMemFree(id);
@@ -157,9 +155,7 @@ bool bootstrapper::is_saved_routing(DWORD pid, IMMDevice *dev) const
 
 bool bootstrapper::is_managed_app(DWORD pid) const
 {
-    WCHAR path[MAX_PATH] = {
-        0
-    };
+    WCHAR path[MAX_PATH] = {0};
 
     if (!get_path(pid, path, MAX_PATH)) {
         return false;
@@ -189,9 +185,7 @@ void bootstrapper::save_routing(DWORD pid, IMMDevice *dev)
         return;
     }
 
-    WCHAR path[MAX_PATH] = {
-        0
-    };
+    WCHAR path[MAX_PATH] = {0};
 
     if (!get_path(pid, path, MAX_PATH)) {
         return;
@@ -308,9 +302,7 @@ void bootstrapper::update_save()
 
 bool bootstrapper::delete_all(DWORD pid)
 {
-    WCHAR path[MAX_PATH] = {
-        0
-    };
+    WCHAR path[MAX_PATH] = {0};
 
     if (!get_path(pid, path, MAX_PATH)) {
         return false;

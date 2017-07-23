@@ -49,10 +49,8 @@ void app_inject::get_devices(devices_t& devices)
     IMMDeviceEnumerator *pEnumerator;
     IMMDeviceCollection *pDevices;
 
-    if (CoCreateInstance(
-            __uuidof(MMDeviceEnumerator), NULL,
-            CLSCTX_INPROC_SERVER, __uuidof(IMMDeviceEnumerator),
-            (void **)&pEnumerator) != S_OK)
+    if (CoCreateInstance(__uuidof(MMDeviceEnumerator), NULL, CLSCTX_INPROC_SERVER, 
+        __uuidof(IMMDeviceEnumerator), (void **)&pEnumerator) != S_OK)
     {
         SAFE_RELEASE(pEnumerator);
         return;
@@ -63,17 +61,15 @@ void app_inject::get_devices(devices_t& devices)
         pEnumerator->Release();
         return;
     }
-
     pEnumerator->Release();
-    UINT count;
 
+    UINT count;
     if (pDevices->GetCount(&count) != S_OK) {
         pDevices->Release();
         return;
     }
 
     IMMDevice *pEndpoint = NULL;
-
     for (ULONG i = 0; i < count; i++) {
         pDevices->Item(i, &pEndpoint);
         devices.push_back(pEndpoint);
@@ -118,11 +114,7 @@ void app_inject::populate_devicelist()
 } // populate_devicelist
 
 // createprocessw lpcommandline must not be const literal
-void app_inject::inject(DWORD process_id,
-    bool x86,
-    size_t device_index,
-    flush_t flush,
-    bool duplicate)
+void app_inject::inject(DWORD process_id, bool x86, size_t device_index, flush_t flush, bool duplicate)
 {
     IMMDevice *pEndpoint = NULL;
     LPWSTR pwszID = NULL;
@@ -156,10 +148,8 @@ void app_inject::inject(DWORD process_id,
 
     // create file mapped object for ipc
     security_attributes sec(FILE_MAP_ALL_ACCESS);
-    CHandle hfile(CreateFileMapping(
-            INVALID_HANDLE_VALUE, sec.get(), PAGE_READWRITE, 0,
-            global_size(&routing_params),
-            L"Local\\audio-router-file"));
+    CHandle hfile(CreateFileMapping(INVALID_HANDLE_VALUE, sec.get(), PAGE_READWRITE, 0,
+            global_size(&routing_params), L"Local\\audio-router-file"));
 
     if (hfile == NULL || (pwszID && *pwszID == NULL)) {
         CoTaskMemFree(pwszID);
@@ -204,14 +194,12 @@ void app_inject::inject_dll(DWORD pid, bool x86, DWORD tid, DWORD flags)
     // flag = 1: bootstrapper and audio router dll are implicitly loaded
     // flag = 2: bootstrapper is implicitly loaded
     // flag = 3: bootstrapper is explicitly loaded
-    assert(flags <= 3);
-    assert((flags && flags <= 2) ? tid : true);
+    assert(flags <= APP_INJECT_DLL_FLAG_BOOTSTRAPPER_EXPLICITLY_LOADED);
+    assert((flags && flags <= APP_INJECT_DLL_FLAG_BOOTSTRAPPER_IMPLICITLY_LOADED) ? tid : true);
     assert(pid);
 
     // retrieve the paths
-    WCHAR filepath[MAX_PATH] = {
-        0
-    };
+    WCHAR filepath[MAX_PATH] = {0};
     GetModuleFileName(NULL, filepath, MAX_PATH);
     CPath path(filepath);
     path.RemoveFileSpec();
@@ -228,15 +216,9 @@ void app_inject::inject_dll(DWORD pid, bool x86, DWORD tid, DWORD flags)
     exe += L".exe\"";
 
     // inject
-    TCHAR buf[32] = {
-        0
-    };
-    TCHAR buf2[32] = {
-        0
-    };
-    TCHAR buf3[32] = {
-        0
-    };
+    TCHAR buf[32] = {0};
+    TCHAR buf2[32] = {0};
+    TCHAR buf3[32] = {0};
     _itot((int)pid, buf, 10);
     _itot((int)tid, buf2, 10);
     _itot((int)flags, buf3, 10);
@@ -267,8 +249,7 @@ void app_inject::inject_dll(DWORD pid, bool x86, DWORD tid, DWORD flags)
 # define DO_EXE_WAIT_TIMEOUT 5000
 #endif
 
-    if (!CreateProcess(
-            NULL, const_cast<LPWSTR>(command_line.c_str()),
+    if (!CreateProcess(NULL, const_cast<LPWSTR>(command_line.c_str()),
             NULL, NULL, FALSE, CREATEPROCESS_FLAGS, NULL, NULL, &si, &pi))
     {
         throw_errormessage(GetLastError());

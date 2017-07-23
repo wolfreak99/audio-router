@@ -7,6 +7,7 @@
 #include "main.h"
 #include "patcher.h"
 #include "patch.h"
+#include "common.h"
 
 #pragma comment(lib, "uuid.lib")
 
@@ -16,12 +17,7 @@
 #define GET_ROUTING_FLAG(a) (a >> (sizeof(DWORD) * 8 - 2))
 
 #ifndef SAFE_RELEASE
-# define SAFE_RELEASE(x)\
-    if (x != NULL) {\
-        x->Release();\
-        x = NULL;\
-    }
-
+# define SAFE_RELEASE(x) assert(strcmp("main.cpp: SAFE_RELEASE is not defined, check if wtl.h access", "") == 0)
 #endif
 
 struct device_id_t
@@ -58,24 +54,17 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
         IMMDeviceEnumerator *pEnumerator;
         IMMDevice *pDevice;
 
-        hr = CoInitialize(NULL);
-
-        if (hr != S_OK) {
+        if ((hr = CoInitialize(NULL)) != S_OK) {
             return FALSE;
         }
 
-        hr = CoCreateInstance(
-            __uuidof(MMDeviceEnumerator), NULL,
-            CLSCTX_ALL, __uuidof(IMMDeviceEnumerator),
-            (void **)&pEnumerator);
-
-        if (hr != S_OK) {
+        if ((hr = CoCreateInstance(__uuidof(MMDeviceEnumerator), NULL, CLSCTX_ALL,
+            __uuidof(IMMDeviceEnumerator), (void **)&pEnumerator)) != S_OK)
+        {
             return FALSE;
         }
 
-        hr = pEnumerator->GetDefaultAudioEndpoint(eRender, eConsole, &pDevice);
-
-        if (hr != S_OK) {
+        if ((hr = pEnumerator->GetDefaultAudioEndpoint(eRender, eConsole, &pDevice)) != S_OK) {
             pEnumerator->Release();
             return FALSE;
         }
@@ -124,9 +113,7 @@ bool apply_parameters(const local_routing_params& params)
         EnterCriticalSection(&CriticalSection);
 
         patch_activate.revert();
-        delete device_ids;
-        device_ids = NULL;
-
+        SafeDelete(device_ids);
         LeaveCriticalSection(&CriticalSection);
 
         return true;
@@ -141,8 +128,7 @@ bool apply_parameters(const local_routing_params& params)
         std::wstring device_id;
 
         if (GET_ROUTING_FLAG(session_flag) == 1) {
-            delete device_ids;
-            device_ids = NULL;
+            SafeDelete(device_ids);
         }
 
         for (const wchar_t *p = (const wchar_t *)params.device_id_ptr; *p; p++) {
@@ -173,13 +159,11 @@ bool apply_parameters(const local_routing_params& params)
 bool apply_explicit_routing()
 {
     CHandle hfile(OpenFileMappingW(FILE_MAP_READ, FALSE, L"Local\\audio-router-file"));
-
     if (hfile == NULL) {
         return false;
     }
 
     unsigned char *buffer = (unsigned char *)MapViewOfFile(hfile, FILE_MAP_COPY, 0, 0, 0);
-
     if (buffer == NULL) {
         return false;
     }
@@ -190,11 +174,9 @@ bool apply_explicit_routing()
     return ret;
 } // apply_explicit_routing
 
-HRESULT __stdcall activate_patch(IMMDevice *this_,
-    REFIID iid,
-    DWORD dwClsCtx,
-    PROPVARIANT *pActivationParams,
-    void **ppInterface)
+
+
+HRESULT __stdcall activate_patch(IMMDevice *this_, REFIID iid, DWORD dwClsCtx,  PROPVARIANT *pActivationParams, void **ppInterface)
 {
     EnterCriticalSection(&CriticalSection);
     patch_activate.revert();
@@ -223,10 +205,8 @@ HRESULT __stdcall activate_patch(IMMDevice *this_,
         IMMDeviceCollection *pDevices = NULL;
         IMMDevice *pDevice = NULL;
 
-        if ((hr = CoCreateInstance(
-                    __uuidof(MMDeviceEnumerator), NULL,
-                    CLSCTX_INPROC_SERVER, __uuidof(IMMDeviceEnumerator),
-                    (void **)&pEnumerator)) != S_OK)
+        if ((hr = CoCreateInstance(__uuidof(MMDeviceEnumerator), NULL, CLSCTX_INPROC_SERVER, 
+            __uuidof(IMMDeviceEnumerator), (void **)&pEnumerator)) != S_OK)
         {
             SAFE_RELEASE(pEnumerator);
             patch_activate.apply();
@@ -234,9 +214,7 @@ HRESULT __stdcall activate_patch(IMMDevice *this_,
             return hr;
         }
 
-        if ((hr =
-                    pEnumerator->EnumAudioEndpoints(eRender, DEVICE_STATE_ACTIVE,
-                    &pDevices)) != S_OK) {
+        if ((hr = pEnumerator->EnumAudioEndpoints(eRender, DEVICE_STATE_ACTIVE, &pDevices)) != S_OK) {
             SAFE_RELEASE(pDevices);
             pEnumerator->Release();
             patch_activate.apply();
@@ -245,7 +223,6 @@ HRESULT __stdcall activate_patch(IMMDevice *this_,
         }
 
         UINT count;
-
         if ((hr = pDevices->GetCount(&count)) != S_OK) {
             pDevices->Release();
             pEnumerator->Release();
@@ -256,15 +233,14 @@ HRESULT __stdcall activate_patch(IMMDevice *this_,
 
         LPWSTR dev_id = NULL;
         this_->GetId(&dev_id);
+
         bool endpoint_found = dev_id ? false : true;
-        IMMDevice *pEndpoint = NULL;
-
         for (ULONG i = 0; i < count; i++) {
-            LPWSTR pwszID;
-
+            IMMDevice *pEndpoint = NULL;
             pDevices->Item(i, &pEndpoint);
 
             // Get the endpoint ID string.
+            LPWSTR pwszID;
             pEndpoint->GetId(&pwszID);
 
             if (!pDevice && wcscmp(device_ids->proxy->device_id_str, pwszID) == 0) {
@@ -277,21 +253,14 @@ HRESULT __stdcall activate_patch(IMMDevice *this_,
             }
 
             CoTaskMemFree(pwszID);
-
-            if (!pDevice) {
-                pEndpoint->Release();
-            }
+            if (!pDevice) pEndpoint->Release();
         }
 
         CoTaskMemFree(dev_id);
 
         if (!endpoint_found) {
             HRESULT hr = this_->Activate(iid, dwClsCtx, pActivationParams, ppInterface);
-
-            if (pDevice) {
-                pDevice->Release();
-            }
-
+            SAFE_RELEASE(pDevice);
             pDevices->Release();
             pEnumerator->Release();
             patch_activate.apply();
@@ -309,13 +278,10 @@ HRESULT __stdcall activate_patch(IMMDevice *this_,
         if (!pDevice ||
             (hr = pDevice->Activate(iid, dwClsCtx, pActivationParams, ppInterface)) != S_OK)
         {
-            if (pDevice) {
-                pDevice->Release();
-            }
-            else {
+            if (!pDevice)
                 hr = AUDCLNT_E_DEVICE_INVALIDATED;
-            }
 
+            SAFE_RELEASE(pDevice);
             pDevices->Release();
             pEnumerator->Release();
             patch_activate.apply();
@@ -352,10 +318,8 @@ HRESULT __stdcall activate_patch(IMMDevice *this_,
         IMMDevice *pDevice = NULL;
         IAudioClient *pAudioClient = NULL;
 
-        if (CoCreateInstance(
-                __uuidof(MMDeviceEnumerator), NULL,
-                CLSCTX_INPROC_SERVER, __uuidof(IMMDeviceEnumerator),
-                (void **)&pEnumerator) != S_OK)
+        if (CoCreateInstance(__uuidof(MMDeviceEnumerator), NULL, CLSCTX_INPROC_SERVER,
+            __uuidof(IMMDeviceEnumerator), (void **)&pEnumerator) != S_OK)
         {
             SAFE_RELEASE(pEnumerator);
             continue;
@@ -368,31 +332,27 @@ HRESULT __stdcall activate_patch(IMMDevice *this_,
         }
 
         UINT count;
-
         if (pDevices->GetCount(&count) != S_OK) {
             pDevices->Release();
             pEnumerator->Release();
             continue;
         }
 
-        bool cont = true;
+        bool endpoint_found = false;
         IMMDevice *pEndpoint = NULL;
-
-        for (ULONG i = 0; i < count && cont; i++) {
-            LPWSTR pwszID;
-
+        for (ULONG i = 0; i < count && !endpoint_found; i++) {
             pDevices->Item(i, &pEndpoint);
 
             // Get the endpoint ID string.
+            LPWSTR pwszID;
             pEndpoint->GetId(&pwszID);
 
             if (wcscmp(next->proxy->device_id_str, pwszID) == 0) {
-                cont = false;
+                endpoint_found = true;
             }
 
             CoTaskMemFree(pwszID);
-
-            if (cont) {
+            if (!endpoint_found) {
                 pEndpoint->Release();
             }
         }
@@ -400,40 +360,31 @@ HRESULT __stdcall activate_patch(IMMDevice *this_,
         pDevice = pEndpoint;
 
         // TODO/audiorouterdev: device id might be invalid in case if the endpoint has been disconnected
-        if (cont) {
-            MessageBoxA(
-                NULL, "Endpoint device was not found during routing process.",
-                NULL, MB_ICONERROR);
-        }
-
-        if (!cont &&
-            pDevice->Activate(iid, dwClsCtx, pActivationParams, (void **)&pAudioClient) != S_OK)
-        {
-            SAFE_RELEASE(pAudioClient);
-            pDevice->Release();
+        if (!endpoint_found) {
+            MessageBoxA(NULL, "Endpoint device was not found during routing process.", NULL, MB_ICONERROR);
             pDevices->Release();
             pEnumerator->Release();
             continue;
         }
+        else {
+            // Device found, attempt to activate it.
+            if (pDevice->Activate(iid, dwClsCtx, pActivationParams, (void **)&pAudioClient) != S_OK) {
+                SAFE_RELEASE(pAudioClient);
+                continue;
+            }
+            else {
+                /*GUID* guid = new GUID;
+                ZeroMemory(guid, sizeof(GUID));
+                const DWORD session_guid = session_flag & SESSION_MASK;
+                size_t starting_byte = 7;
+                memcpy(((char*)guid) + starting_byte, &session_guid, sizeof(session_guid));*/
 
-        if (!cont) {
+                get_duplicate((IAudioClient *)*ppInterface)->add(pAudioClient);
+            }
             pDevice->Release();
+            pDevices->Release();
+            pEnumerator->Release();
         }
-
-        pDevices->Release();
-        pEnumerator->Release();
-
-        if (cont) {
-            continue;
-        }
-
-        /*GUID* guid = new GUID;
-           ZeroMemory(guid, sizeof(GUID));
-           const DWORD session_guid = session_flag & SESSION_MASK;
-           size_t starting_byte = 7;
-           memcpy(((char*)guid) + starting_byte, &session_guid, sizeof(session_guid));*/
-
-        get_duplicate((IAudioClient *)*ppInterface)->add(pAudioClient);
     }
 
     patch_activate.apply();

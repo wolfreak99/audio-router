@@ -25,7 +25,7 @@ DWORD_PTR* swap_vtable(IAudioClient *this_)
 {
     DWORD_PTR *old_vftptr = ((DWORD_PTR **)this_)[0];
 
-    ((DWORD_PTR **)this_)[0] = ((DWORD_PTR ***)this_)[0][15];
+    ((DWORD_PTR **)this_)[0] = ((DWORD_PTR ***)this_)[0][IAUDIOCLIENT_VFTPTR_IND_OLD];
     return old_vftptr;
 }
 
@@ -33,8 +33,8 @@ HRESULT __stdcall release_patch(IAudioClient *this_)
 {
     iaudioclient_duplicate *dup = get_duplicate(this_);
     IAudioClient *proxy = dup->proxy;
-    GUID *arg = ((GUID ***)this_)[0][17];
-    WORD *arg2 = ((WORD ***)this_)[0][18];
+    GUID *arg = ((GUID ***)this_)[0][IAUDIOCLIENT_VFTPTR_IND_SESSION_GUID];
+    WORD *arg2 = ((WORD ***)this_)[0][IAUDIOCLIENT_VFTPTR_IND_18];
     DWORD_PTR *old_vftptr = swap_vtable(this_);
     ULONG result = this_->Release();
 
@@ -54,15 +54,11 @@ HRESULT __stdcall release_patch(IAudioClient *this_)
 
 iaudioclient_duplicate* get_duplicate(IAudioClient *this_)
 {
-    return ((iaudioclient_duplicate ***)this_)[0][16];
+    return ((iaudioclient_duplicate ***)this_)[0][IAUDIOCLIENT_VFTPTR_IND_DUP];
 }
 
-HRESULT __stdcall initialize_patch(IAudioClient *this_,
-    AUDCLNT_SHAREMODE ShareMode,
-    DWORD StreamFlags,
-    REFERENCE_TIME hnsBufferDuration,
-    REFERENCE_TIME hnsPeriodicity,
-    const WAVEFORMATEX *pFormat,
+HRESULT __stdcall initialize_patch(IAudioClient *this_, AUDCLNT_SHAREMODE ShareMode, DWORD StreamFlags,
+    REFERENCE_TIME hnsBufferDuration, REFERENCE_TIME hnsPeriodicity, const WAVEFORMATEX *pFormat,
     LPCGUID AudioSessionGuid)
 {
     // synchronize initializing so it doesn't happen while streams are being flushed
@@ -76,7 +72,7 @@ HRESULT __stdcall initialize_patch(IAudioClient *this_,
     }
 
     IAudioClient *proxy = get_duplicate(this_)->proxy;
-    LPCGUID guid = ((GUID ***)this_)[0][17];
+    LPCGUID guid = ((GUID ***)this_)[0][IAUDIOCLIENT_VFTPTR_IND_SESSION_GUID];
     DWORD_PTR *old_vftptr = swap_vtable(this_);
     HRESULT hr = proxy->Initialize(
         ShareMode,
@@ -93,7 +89,7 @@ HRESULT __stdcall initialize_patch(IAudioClient *this_,
         tell_error(hr);
     }
     else {
-        *((WORD ***)this_)[0][18] = pFormat->nBlockAlign;
+        *((WORD ***)this_)[0][IAUDIOCLIENT_VFTPTR_IND_18] = pFormat->nBlockAlign;
     }
 
     if (hr == S_OK) {
@@ -315,18 +311,15 @@ HRESULT __stdcall reset_patch(IAudioClient *this_)
 
     ((DWORD_PTR **)this_)[0] = old_vftptr;
 
-    for (iaudioclient_duplicate *next = get_duplicate(this_)->next; next != NULL; next =
-            next->next) {
+    for (iaudioclient_duplicate *next = get_duplicate(this_)->next; next != NULL; next = next->next) {
         next->proxy->Reset();
     }
 
     return hr;
 }
 
-HRESULT __stdcall isformatsupported_patch(IAudioClient *this_,
-    AUDCLNT_SHAREMODE ShareMode,
-    const WAVEFORMATEX *pFormat,
-    WAVEFORMATEX **ppClosestMatch)
+HRESULT __stdcall isformatsupported_patch(IAudioClient *this_, AUDCLNT_SHAREMODE ShareMode,
+    const WAVEFORMATEX *pFormat, WAVEFORMATEX **ppClosestMatch)
 {
     // STATIC FUNCTION
     IAudioClient *proxy = get_duplicate(this_)->proxy;
@@ -346,13 +339,15 @@ HRESULT __stdcall isformatsupported_patch(IAudioClient *this_,
 //    return hr;
 // }
 
+
+
 void patch_iaudioclient(IAudioClient *this_, LPGUID session_guid)
 {
     // create new virtual table and save old and populate new with default
     DWORD_PTR *old_vftptr = ((DWORD_PTR **)this_)[0]; // save old virtual table
 
     // create new virtual table (slot 15 for old table ptr and 16 for duplicate)
-    ((DWORD_PTR **)this_)[0] = new DWORD_PTR[19];
+    ((DWORD_PTR **)this_)[0] = new DWORD_PTR[IAUDIOCLIENT_VFTPTR_COUNT];
     memcpy(((DWORD_PTR **)this_)[0], old_vftptr, 15 * sizeof(DWORD_PTR));
 
     // created duplicate object
@@ -360,24 +355,23 @@ void patch_iaudioclient(IAudioClient *this_, LPGUID session_guid)
 
     // patch routines
     DWORD_PTR *vftptr = ((DWORD_PTR **)this_)[0];
-    vftptr[10] = (DWORD_PTR)start_patch;
-    vftptr[14] = (DWORD_PTR)getservice_patch;
-    vftptr[11] = (DWORD_PTR)stop_patch;
-    vftptr[3] = (DWORD_PTR)initialize_patch;
-    vftptr[4] = (DWORD_PTR)getbuffersize_patch;
-    vftptr[6] = (DWORD_PTR)getcurrentpadding_patch;
-    vftptr[13] = (DWORD_PTR)seteventhandle_patch;
-    vftptr[5] = (DWORD_PTR)getstreamlatency_patch;
-    vftptr[8] = (DWORD_PTR)getmixformat_patch; // static
-    vftptr[9] = (DWORD_PTR)getdeviceperiod_patch; // static
-    vftptr[12] = (DWORD_PTR)reset_patch;
-    vftptr[7] = (DWORD_PTR)isformatsupported_patch; // static
-    vftptr[2] = (DWORD_PTR)release_patch;
-
     // vftptr[0] = (DWORD_PTR)queryinterface_patch; // NEW
-
-    vftptr[15] = (DWORD_PTR)old_vftptr;
-    vftptr[16] = (DWORD_PTR)dup;
-    vftptr[17] = (DWORD_PTR)session_guid;
-    vftptr[18] = (DWORD_PTR) new WORD; // block align
+    // NOTE/wolfreak99: some reason index 1 is missing.
+    vftptr[IAUDIOCLIENT_VFTPTR_IND_RELEASE]             = (DWORD_PTR)release_patch;
+    vftptr[IAUDIOCLIENT_VFTPTR_IND_INITIALIZE]          = (DWORD_PTR)initialize_patch;
+    vftptr[IAUDIOCLIENT_VFTPTR_IND_GET_BUFFER_SIZE]     = (DWORD_PTR)getbuffersize_patch;
+    vftptr[IAUDIOCLIENT_VFTPTR_IND_GET_STREAM_LATENCY]  = (DWORD_PTR)getstreamlatency_patch;
+    vftptr[IAUDIOCLIENT_VFTPTR_IND_GET_CURRENT_PADDING] = (DWORD_PTR)getcurrentpadding_patch;
+    vftptr[IAUDIOCLIENT_VFTPTR_IND_IS_FORMAT_SUPPORTED] = (DWORD_PTR)isformatsupported_patch; // static
+    vftptr[IAUDIOCLIENT_VFTPTR_IND_GET_MIX_FORMAT]      = (DWORD_PTR)getmixformat_patch; // static
+    vftptr[IAUDIOCLIENT_VFTPTR_IND_GET_DEVICE_PERIOD]   = (DWORD_PTR)getdeviceperiod_patch; // static
+    vftptr[IAUDIOCLIENT_VFTPTR_IND_START]               = (DWORD_PTR)start_patch;
+    vftptr[IAUDIOCLIENT_VFTPTR_IND_STOP]                = (DWORD_PTR)stop_patch;
+    vftptr[IAUDIOCLIENT_VFTPTR_IND_RESET]               = (DWORD_PTR)reset_patch;
+    vftptr[IAUDIOCLIENT_VFTPTR_IND_SET_EVENT_HANDLE]    = (DWORD_PTR)seteventhandle_patch;
+    vftptr[IAUDIOCLIENT_VFTPTR_IND_GET_SERVICE]         = (DWORD_PTR)getservice_patch;
+    vftptr[IAUDIOCLIENT_VFTPTR_IND_OLD]                 = (DWORD_PTR)old_vftptr;
+    vftptr[IAUDIOCLIENT_VFTPTR_IND_DUP]                 = (DWORD_PTR)dup;
+    vftptr[IAUDIOCLIENT_VFTPTR_IND_SESSION_GUID]        = (DWORD_PTR)session_guid;
+    vftptr[IAUDIOCLIENT_VFTPTR_IND_18]                  = (DWORD_PTR) new WORD; // block align
 } // patch_iaudioclient

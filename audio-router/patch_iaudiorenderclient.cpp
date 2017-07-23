@@ -6,7 +6,7 @@ DWORD_PTR* swap_vtable(IAudioRenderClient *this_)
 {
     DWORD_PTR *old_vftptr = ((DWORD_PTR **)this_)[0];
 
-    ((DWORD_PTR **)this_)[0] = ((DWORD_PTR ***)this_)[0][5];
+    ((DWORD_PTR **)this_)[0] = ((DWORD_PTR ***)this_)[0][IAUDIORENDERCLIENT_VFTPTR_IND_OLD];
     return old_vftptr;
 }
 
@@ -14,8 +14,8 @@ HRESULT __stdcall release_patch(IAudioRenderClient *this_)
 {
     iaudiorenderclient_duplicate *dup = get_duplicate(this_);
     IAudioRenderClient *proxy = dup->proxy;
-    UINT32 *arg = ((UINT32 ***)this_)[0][8];
-    WORD *arg2 = ((WORD ***)this_)[0][9];
+    UINT32 *arg = ((UINT32 ***)this_)[0][IAUDIORENDERCLIENT_VFTPTR_IND_NUM_FRAMES_REQUESTED];
+    WORD *arg2 = ((WORD ***)this_)[0][IAUDIORENDERCLIENT_VFTPTR_IND_FRAME_SIZE];
     DWORD_PTR *old_vftptr = swap_vtable(this_);
     ULONG result = this_->Release();
 
@@ -35,12 +35,10 @@ HRESULT __stdcall release_patch(IAudioRenderClient *this_)
 
 iaudiorenderclient_duplicate* get_duplicate(IAudioRenderClient *this_)
 {
-    return ((iaudiorenderclient_duplicate ***)this_)[0][6];
+    return ((iaudiorenderclient_duplicate ***)this_)[0][IAUDIORENDERCLIENT_VFTPTR_IND_DUP];
 }
 
-HRESULT __stdcall getbuffer_patch(IAudioRenderClient *this_,
-    UINT32 NumFramesRequested,
-    BYTE **ppData)
+HRESULT __stdcall getbuffer_patch(IAudioRenderClient *this_, UINT32 NumFramesRequested, BYTE **ppData)
 {
     IAudioRenderClient *proxy = get_duplicate(this_)->proxy;
     DWORD_PTR *old_vftptr = swap_vtable(this_);
@@ -49,11 +47,11 @@ HRESULT __stdcall getbuffer_patch(IAudioRenderClient *this_,
     ((DWORD_PTR **)this_)[0] = old_vftptr;
 
     if (ppData != NULL && hr == S_OK && NumFramesRequested > 0) {
-        ((BYTE ***)this_)[0][7] = *ppData;
-        *((UINT32 ***)this_)[0][8] = NumFramesRequested;
+        ((BYTE ***)this_)[0][IAUDIORENDERCLIENT_VFTPTR_IND_BUFFER_PTR] = *ppData;
+        *((UINT32 ***)this_)[0][IAUDIORENDERCLIENT_VFTPTR_IND_NUM_FRAMES_REQUESTED] = NumFramesRequested;
     }
     else {
-        ((BYTE ***)this_)[0][7] = NULL;
+        ((BYTE ***)this_)[0][IAUDIORENDERCLIENT_VFTPTR_IND_BUFFER_PTR] = NULL;
     }
 
     return hr;
@@ -69,14 +67,12 @@ template <typename T> void copy_mem(BYTE *buffer2_, const BYTE *buffer_, UINT32 
     }
 }
 
-HRESULT __stdcall releasebuffer_patch(IAudioRenderClient *this_,
-    UINT32 NumFramesWritten,
-    DWORD dwFlags)
+HRESULT __stdcall releasebuffer_patch(IAudioRenderClient *this_, UINT32 NumFramesWritten, DWORD dwFlags)
 {
     IAudioRenderClient *proxy = get_duplicate(this_)->proxy;
-    const BYTE *buffer = ((BYTE ***)this_)[0][7];
-    const UINT32 frames_req = *((UINT32 ***)this_)[0][8];
-    const WORD framesize = *((WORD ***)this_)[0][9];
+    const BYTE *buffer = ((BYTE ***)this_)[0][IAUDIORENDERCLIENT_VFTPTR_IND_BUFFER_PTR];
+    const UINT32 frames_req = *((UINT32 ***)this_)[0][IAUDIORENDERCLIENT_VFTPTR_IND_NUM_FRAMES_REQUESTED];
+    const WORD framesize = *((WORD ***)this_)[0][IAUDIORENDERCLIENT_VFTPTR_IND_FRAME_SIZE];
 
     if (buffer != NULL) {
         for (iaudiorenderclient_duplicate *next = get_duplicate(this_)->next;
@@ -115,7 +111,7 @@ HRESULT __stdcall releasebuffer_patch(IAudioRenderClient *this_,
         }
     }
 
-    ((BYTE ***)this_)[0][7] = NULL;
+    ((BYTE ***)this_)[0][IAUDIORENDERCLIENT_VFTPTR_IND_BUFFER_PTR] = NULL;
 
     DWORD_PTR *old_vftptr = swap_vtable(this_);
     HRESULT hr = proxy->ReleaseBuffer(NumFramesWritten, dwFlags);
@@ -130,7 +126,7 @@ void patch_iaudiorenderclient(IAudioRenderClient *this_, WORD block_align)
     DWORD_PTR *old_vftptr = ((DWORD_PTR **)this_)[0]; // save old virtual table
 
     // create new virtual table (slot 5 for old table ptr and 6 for duplicate)
-    ((DWORD_PTR **)this_)[0] = new DWORD_PTR[10];
+    ((DWORD_PTR **)this_)[0] = new DWORD_PTR[IAUDIORENDERCLIENT_VFTPTR_COUNT];
     memcpy(((DWORD_PTR **)this_)[0], old_vftptr, 5 * sizeof(DWORD_PTR));
 
     // created duplicate object
@@ -138,15 +134,13 @@ void patch_iaudiorenderclient(IAudioRenderClient *this_, WORD block_align)
 
     // patch routines
     DWORD_PTR *vftptr = ((DWORD_PTR **)this_)[0];
-    vftptr[2] = (DWORD_PTR)release_patch;
-    vftptr[3] = (DWORD_PTR)getbuffer_patch;
-    vftptr[4] = (DWORD_PTR)releasebuffer_patch;
-
-    vftptr[5] = (DWORD_PTR)old_vftptr;
-    vftptr[6] = (DWORD_PTR)dup;
-    vftptr[7] = NULL; // buffer pointer
-    vftptr[8] = (DWORD_PTR) new UINT32; // NumFramesRequested
-    vftptr[9] = (DWORD_PTR) new WORD; // size of audio frame
-
-    *(WORD *)(vftptr[9]) = block_align;
+    vftptr[IAUDIORENDERCLIENT_VFTPTR_IND_RELEASE]               = (DWORD_PTR)release_patch;
+    vftptr[IAUDIORENDERCLIENT_VFTPTR_IND_GET_BUFFER]            = (DWORD_PTR)getbuffer_patch;
+    vftptr[IAUDIORENDERCLIENT_VFTPTR_IND_RELEASE_BUFFER]        = (DWORD_PTR)releasebuffer_patch;
+    vftptr[IAUDIORENDERCLIENT_VFTPTR_IND_OLD]                   = (DWORD_PTR)old_vftptr;
+    vftptr[IAUDIORENDERCLIENT_VFTPTR_IND_DUP]                   = (DWORD_PTR)dup;
+    vftptr[IAUDIORENDERCLIENT_VFTPTR_IND_BUFFER_PTR]            = NULL; // buffer pointer
+    vftptr[IAUDIORENDERCLIENT_VFTPTR_IND_NUM_FRAMES_REQUESTED]  = (DWORD_PTR) new UINT32; // NumFramesRequested
+    vftptr[IAUDIORENDERCLIENT_VFTPTR_IND_FRAME_SIZE]            = (DWORD_PTR) new WORD; // size of audio frame
+    *(WORD *)(vftptr[IAUDIORENDERCLIENT_VFTPTR_IND_FRAME_SIZE]) = block_align;
 } // patch_iaudiorenderclient
