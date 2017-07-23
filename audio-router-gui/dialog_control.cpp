@@ -191,9 +191,7 @@ public:
     }
 
     HRESULT STDMETHODCALLTYPE OnChannelVolumeChanged(DWORD ChannelCount,
-        float NewChannelVolumeArray[],
-        DWORD ChangedChannel,
-        LPCGUID EventContext)
+        float NewChannelVolumeArray[], DWORD ChangedChannel, LPCGUID EventContext)
     {
         return S_OK;
     }

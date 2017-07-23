@@ -10,6 +10,7 @@
 #include <endpointvolume.h>
 #include <functiondiscoverykeys_devpkey.h>
 #include "policy_config.h"
+#include "../audio-router/common.h"
 
 #define AUDCLNT_S_NO_SINGLE_PROCESS AUDCLNT_SUCCESS(0x00d)
 #define PROCESS_ACCESS_LEVEL PROCESS_ALL_ACCESS
@@ -53,10 +54,10 @@ public:
 };
 
 dialog_array::dialog_array(dialog_main& parent) : parent(parent), device(NULL),
-                                                  session_manager(NULL),
-                                                  audio_volume(NULL), default_device(NULL),
-                                                  session_notif(NULL), icon(NULL)
-{}
+    session_manager(NULL),audio_volume(NULL), default_device(NULL), session_notif(NULL), icon(NULL)
+{
+
+}
 
 dialog_array::~dialog_array()
 {
@@ -145,8 +146,7 @@ void dialog_array::set_device(device_t device, const std::wstring& device_name)
     this->parent.RedrawWindow(); // for some odd reason redrawing cstatic wont help
 
     if (this->device != NULL) {
-        if (this->device->Activate(
-                __uuidof(IAudioEndpointVolume), CLSCTX_ALL, NULL,
+        if (this->device->Activate(__uuidof(IAudioEndpointVolume), CLSCTX_ALL, NULL,
                 (void **)&this->audio_volume) != S_OK)
         {
             SAFE_RELEASE(this->audio_volume);
@@ -158,8 +158,7 @@ void dialog_array::set_device(device_t device, const std::wstring& device_name)
         // set audio volume for default device
         IMMDeviceEnumerator *pEnumerator;
 
-        if (CoCreateInstance(
-                __uuidof(MMDeviceEnumerator), NULL,
+        if (CoCreateInstance(__uuidof(MMDeviceEnumerator), NULL,
                 CLSCTX_INPROC_SERVER, __uuidof(IMMDeviceEnumerator),
                 (void **)&pEnumerator) != S_OK)
         {
@@ -179,8 +178,7 @@ void dialog_array::set_device(device_t device, const std::wstring& device_name)
 
         this->default_device = default_endpoint;
 
-        if (default_endpoint->Activate(
-                __uuidof(IAudioEndpointVolume), CLSCTX_ALL, NULL,
+        if (default_endpoint->Activate(__uuidof(IAudioEndpointVolume), CLSCTX_ALL, NULL,
                 (void **)&this->audio_volume) != S_OK)
         {
             SAFE_RELEASE(this->audio_volume);
@@ -254,12 +252,7 @@ cont:
 
 void dialog_array::set_volume(int level, bool set)
 {
-    if (level > 100) {
-        level = 100;
-    }
-    else if (level < 0) {
-        level = 0;
-    }
+    level = clamp(level, 0, 100);
 
     this->ctrl_slider.SetPos(100 - level);
 
@@ -290,10 +283,8 @@ void dialog_array::refresh_dialog_controls()
         if (this->session_manager->RegisterSessionNotification(
                 (this->session_notif = new session_notifications(*this))) != S_OK)
         {
-            this->session_notif->Release();
-            this->session_manager->Release();
-            this->session_manager = NULL;
-            this->session_notif = NULL;
+            SAFE_RELEASE(this->session_notif);
+            SAFE_RELEASE(this->session_manager);
             return;
         }
 
@@ -326,9 +317,7 @@ void dialog_array::refresh_dialog_controls()
 
 void dialog_array::reposition_dialog_controls()
 {
-    RECT rc = {
-        0, 0, width, height
-    };
+    RECT rc = {0, 0, width, height};
 
     for (dialog_controls_t::iterator it = this->dialog_controls.begin();
         it != this->dialog_controls.end();
@@ -374,8 +363,7 @@ dialog_control * dialog_array::find_control(DWORD pid)
 }
 
 dialog_control * dialog_array::create_control(DWORD pid,
-    IAudioSessionControl2 *audio_session,
-    bool reposition)
+    IAudioSessionControl2 *audio_session, bool reposition)
 {
     // create control and add audio session
     dialog_controls_t::iterator it = this->find_control_it(pid);
@@ -744,9 +732,7 @@ LRESULT dialog_array::OnSessionCreated(UINT uMsg, WPARAM wParam, LPARAM lParam, 
 LRESULT dialog_array::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
     {
-        RECT rc = {
-            spacing_x, spacing_y, width, height
-        };
+        RECT rc = {spacing_x, spacing_y, width, height};
         this->MapDialogRect(&rc);
         const_cast<int&>(width) = rc.right;
         const_cast<int&>(height) = rc.bottom;
@@ -909,9 +895,6 @@ void dialog_array::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 
     ctrl.GetWindowTextW(str);
     DrawText(
-        lpDrawItemStruct->hDC,
-        str,
-        -1,
-        &lpDrawItemStruct->rcItem,
+        lpDrawItemStruct->hDC, str, -1, &lpDrawItemStruct->rcItem,
         DT_WORDBREAK | DT_END_ELLIPSIS | DT_CENTER | DT_EDITCONTROL | DT_NOPREFIX);
 }

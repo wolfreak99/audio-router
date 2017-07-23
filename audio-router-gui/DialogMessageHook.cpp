@@ -90,10 +90,8 @@ HRESULT CDialogMessageHook::InstallHook(HWND hWnd)
 {
     // make sure the hook is installed
     if (m_hHook == NULL) {
-        m_hHook = ::SetWindowsHookEx(WH_GETMESSAGE,
-            GetMessageProc,
-            _Module.m_hInst,
-            GetCurrentThreadId());
+        m_hHook = ::SetWindowsHookEx(WH_GETMESSAGE, GetMessageProc,
+            _Module.m_hInst, GetCurrentThreadId());
 
         // is the hook set?
         if (m_hHook == NULL) {
