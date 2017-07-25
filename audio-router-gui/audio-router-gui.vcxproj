@@ -177,6 +177,7 @@
     <ClInclude Include="routing_params.h" />
     <ClInclude Include="dialog_main_scroll_helper.h" />
     <ClInclude Include="util.h" />
+    <ClInclude Include="Version.h" />
     <ClInclude Include="window.h" />
     <ClInclude Include="wtl.h" />
   </ItemGroup>
@@ -199,6 +200,7 @@
     <ClCompile Include="routing_params.cpp" />
     <ClCompile Include="dialog_main_scroll_helper.cpp" />
     <ClCompile Include="util.cpp" />
+    <ClCompile Include="Version.cpp" />
     <ClCompile Include="window.cpp" />
   </ItemGroup>
   <ItemGroup>
