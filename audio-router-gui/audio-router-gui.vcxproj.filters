@@ -63,7 +63,7 @@
     <ClInclude Include="SysTray.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="dialog_main_scroll_helper.h">
+    <ClInclude Include="Dialogs\AboutDialog.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -118,7 +118,7 @@
     <ClCompile Include="SysTray.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="dialog_main_scroll_helper.cpp">
+    <ClCompile Include="Dialogs\AboutDialog.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
