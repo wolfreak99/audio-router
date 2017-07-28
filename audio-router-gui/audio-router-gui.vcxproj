@@ -165,6 +165,9 @@
     <ClInclude Include="app_inject.h" />
     <ClInclude Include="app_list.h" />
     <ClInclude Include="bootstrapper.h" />
+    <ClInclude Include="stacktrace\call_stack.hpp" />
+    <ClInclude Include="stacktrace\StackWalker\StackWalker.h" />
+    <ClInclude Include="stacktrace\stack_exception.hpp" />
     <ClInclude Include="SysTray.h" />
     <ClInclude Include="DialogMessageHook.h" />
     <ClInclude Include="dialog_array.h" />
@@ -188,6 +191,9 @@
     <ClCompile Include="app_inject.cpp" />
     <ClCompile Include="app_list.cpp" />
     <ClCompile Include="bootstrapper.cpp" />
+    <ClCompile Include="stacktrace\call_stack_gcc.cpp" />
+    <ClCompile Include="stacktrace\call_stack_msvc.cpp" />
+    <ClCompile Include="stacktrace\StackWalker\StackWalker.cpp" />
     <ClCompile Include="SysTray.cpp" />
     <ClCompile Include="DialogMessageHook.cpp" />
     <ClCompile Include="dialog_array.cpp" />

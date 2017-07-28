@@ -69,6 +69,15 @@
     <ClInclude Include="SysTray.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="stacktrace\stack_exception.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="stacktrace\call_stack.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="stacktrace\StackWalker\StackWalker.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="audio-router-gui.rc">
@@ -125,6 +134,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="SysTray.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="stacktrace\call_stack_gcc.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="stacktrace\call_stack_msvc.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="stacktrace\StackWalker\StackWalker.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
