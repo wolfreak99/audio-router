@@ -3,6 +3,10 @@
 #include "app_list.h"
 #include "app_inject.h"
 #include <cassert>
+#include "stacktrace\stack_exception.hpp"
+
+using namespace std;
+using namespace stacktrace;
 
 delegation::delegation()
 {
@@ -57,15 +61,16 @@ DWORD delegation::pipe_listener_proc(LPVOID arg)
                 assert(b);
                 assert(written == OUTPUT_SIZE);
             }
-            catch (std::wstring err) {
+            catch (const exception & err) {
                 BOOL b = WriteFile(hpipe, &exitcode, OUTPUT_SIZE, &written, NULL);
                 FlushFileBuffers(hpipe);
                 assert(b);
                 assert(written == OUTPUT_SIZE);
 
                 // TODO/audiorouterdev: limit messagebox to 1 instance
-                err += L"Routing functionality couldn't be initialized in the starting process.";
-                MessageBox(NULL, err.c_str(), NULL, MB_ICONERROR);
+                wstring errmsg = string_to_wstring(err.what());
+                errmsg += L"Routing functionality couldn't be initialized in the starting process.";
+                MessageBox(NULL, errmsg.c_str(), NULL, MB_ICONERROR);
             }
         }
 

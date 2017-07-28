@@ -1,5 +1,9 @@
 #include "SysTray.h"
 #include "window.h"
+#include "stacktrace\stack_exception.hpp"
+
+using namespace std;
+using namespace stacktrace;
 
 // TODO/wolfreak99: Create a common.h for stuff such as this
 #include <assert.h>
@@ -46,10 +50,8 @@ BOOL SysTray::SetIcon(HICON hNewIcon)
 
         return 1;
     }
-    catch (std::wstring err) {
+    catch (const exception & err) {
         throw err;
-        assert(false);
-        return 0;
     }
 } // SetIcon
 
@@ -77,10 +79,8 @@ BOOL SysTray::SetTipText(ATL::CString newTipText)
 
         return 1;
     }
-    catch (std::wstring err) {
+    catch (const exception & err) {
         throw err;
-        assert(false);
-        return 0;
     }
 } // SetTipText
 

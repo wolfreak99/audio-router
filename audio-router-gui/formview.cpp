@@ -3,6 +3,11 @@
 #include "policy_config.h"
 #include <cstring>
 #include <cassert>
+#include "stacktrace\stack_exception.hpp"
+#include "util.h"
+
+using namespace std;
+using namespace stacktrace;
 
 #ifndef DISABLE_TELEMETRY
 extern telemetry *telemetry_m;
@@ -209,9 +214,10 @@ void formview::open_dialog()
             injector.populate_devicelist();
             injector.inject(app.id, app.x86, sel_index, flush);
         }
-        catch (std::wstring err) {
-            err += L"Router functionality not available.";
-            this->MessageBoxW(err.c_str(), NULL, MB_ICONERROR);
+        catch (const exception & err) {
+            wstring errmsg = string_to_wstring(err.what());
+            errmsg += L"\nRouter functionality not available.";
+            this->MessageBoxW(errmsg.c_str(), NULL, MB_ICONERROR);
             return;
         }
         // set names

@@ -4,6 +4,8 @@
 #include <string>
 
 void throw_errormessage(DWORD errorcode);
+std::wstring string_to_wstring(const std::string& str);
+std::string wstring_to_string(const std::wstring& wstr);
 
 class security_attributes {
 public:
