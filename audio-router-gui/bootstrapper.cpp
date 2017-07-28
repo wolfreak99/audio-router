@@ -4,8 +4,14 @@
 #include "util.h"
 #include <cassert>
 #include <Psapi.h>
+#include "stacktrace\call_stack.hpp"
+#include "stacktrace\stack_exception.hpp"
+
+using namespace std;
+using namespace stacktrace;
 
 #define LOCAL_PARAMS_FILE L"saved_routings.dat"
+#define LOCAL_PARAMS_FILE_STR "saved_routings.dat"
 #ifdef _DEBUG
 # define SET_FILTERS() { filters.push_back(L"explorer.exe"); /*filters.push_back(L"steam.exe");*/ }
 #else
@@ -55,6 +61,7 @@ void try_loading(HANDLE hfile, global_routing_params *& params, LARGE_INTEGER si
 
     unsigned char *view_of_file = (unsigned char *)MapViewOfFile(hfile, FILE_MAP_READ, 0, 0, 0);
     unsigned char *buffer = NULL;
+    
     __try
     {
         buffer = new unsigned char[size.QuadPart];
@@ -79,8 +86,9 @@ void try_loading(HANDLE hfile, global_routing_params *& params, LARGE_INTEGER si
         }
 
         params = NULL;
-        throw std::wstring(L"The " LOCAL_PARAMS_FILE L" file is corrupted. Please delete the "\
-                                                     L"file and open Audio Router again.\n");
+
+        throw wstring(L"The " LOCAL_PARAMS_FILE L" file is corrupted. Please delete the "\
+            L"file and open Audio Router again.\n");
     }
 } // try_loading
 
@@ -90,12 +98,10 @@ void bootstrapper::load_local_implicit_params(bool create_default_if_empty)
             FILE_SHARE_READ, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL));
 
     if (this->local_file == INVALID_HANDLE_VALUE) {
-        throw std::wstring(L"Could not open or create a new file in the working directory.\n");
+        throw stack_runtime_error("Could not open or create a new file in the working directory.\n");
     }
 
-    LARGE_INTEGER size = {
-        0
-    };
+    LARGE_INTEGER size = {0};
     size.QuadPart = 1;
     GetFileSizeEx(this->local_file, &size);
 
@@ -109,11 +115,17 @@ void bootstrapper::load_local_implicit_params(bool create_default_if_empty)
         this->load_local_implicit_params(false);
     }
     else if (this->implicit_params == NULL) {
-        throw std::wstring(L"The " LOCAL_PARAMS_FILE L" file is empty.\n");
+        throw stack_runtime_error("The " LOCAL_PARAMS_FILE_STR " file is empty.\n");
     }
     else {
-        // rebase and validate the view
-        try_loading(this->implicit_params, this->routing_params, size);
+        try {
+            // rebase and validate the view
+            try_loading(this->implicit_params, this->routing_params, size);
+        }
+        catch (std::wstring errmsg_wstr) {
+            std::string errmsg_str = wstring_to_string(errmsg_wstr);
+            throw stack_runtime_error(errmsg_str);
+        }
     }
 } // load_local_implicit_params
 
@@ -178,7 +190,7 @@ bool bootstrapper::is_managed_app(DWORD pid) const
 void bootstrapper::save_routing(DWORD pid, IMMDevice *dev)
 {
     if (!dev) {
-        throw std::wstring(L"Saving routing to Default Device is not supported.");
+        throw stack_runtime_error("Saving routing to Default Device is not supported.");
     }
 
     if (!this->routing_params) {
@@ -225,7 +237,7 @@ void bootstrapper::save_routing(DWORD pid, IMMDevice *dev)
     try {
         this->update_save();
     }
-    catch (std::wstring err) {
+    catch (const exception & err) {
         *params = NULL;
         CoTaskMemFree(id);
         throw err;
@@ -252,7 +264,7 @@ void bootstrapper::update_save()
     assert(routing_params_size > 0);
 
     if (routing_params_size == 0) {
-        throw std::wstring(L"The internal state of saved routings is corrupted.\n");
+        throw stack_runtime_error("The internal state of saved routings is corrupted.\n");
     }
 
     // update the file and create a view
@@ -267,9 +279,9 @@ void bootstrapper::update_save()
     } while (this->local_file == INVALID_HANDLE_VALUE && GetLastError() == ERROR_USER_MAPPED_FILE);
 
     if (this->local_file == INVALID_HANDLE_VALUE) {
-        throw std::wstring(
-            L"Could not open file " LOCAL_PARAMS_FILE L" while saving routing. "\
-                                                      L"Audio Router is left in an invalid state and must be restarted.\n");
+        throw stack_runtime_error(
+            "Could not open file " LOCAL_PARAMS_FILE_STR " while saving routing. "\
+            "Audio Router is left in an invalid state and must be restarted.\n");
     }
 
     this->implicit_params.Attach(CreateFileMapping(this->local_file, NULL,
@@ -277,8 +289,9 @@ void bootstrapper::update_save()
 
     if (!this->implicit_params) {
         this->local_file.Close();
-        throw std::wstring(L"Unexpected error occured. Old routed savings data is lost. "\
-                           L"Audio Router is left in an invalid state and must be restarted.\n");
+        throw stack_runtime_error(
+            "Unexpected error occured. Old routed savings data is lost. "\
+            "Audio Router is left in an invalid state and must be restarted.\n");
     }
 
     unsigned char *view_of_file = (unsigned char *)MapViewOfFile(this->implicit_params,
@@ -287,9 +300,9 @@ void bootstrapper::update_save()
     if (!view_of_file) {
         this->implicit_params.Close();
         this->local_file.Close();
-        throw std::wstring(
-            L"Unexpected error occured while mapping. Old routed savings data "\
-            L"is lost. Audio Router is left in an invalid state and must be restarted.\n");
+        throw stack_runtime_error(
+            "Unexpected error occured while mapping. Old routed savings data "\
+            "is lost. Audio Router is left in an invalid state and must be restarted.\n");
     }
 
     serialize(routing_params, view_of_file);
@@ -365,7 +378,7 @@ bootstrapper::bootstrapper(HWND hwnd) : available(false), hwnd(hwnd), routing_pa
             app_inject::inject_dll(it->id, it->x86, 0, 3);
             this->available = true;
         }
-        catch (std::wstring err) {}
+        catch (const exception & err) { }
     }
 
     if (!this->available) {
@@ -393,7 +406,7 @@ bootstrapper::~bootstrapper()
             try {
                 app_inject::inject_dll(it->id, it->x86, 0, 3);
             }
-            catch (std::wstring err) {
+            catch (const exception & err) {
 #ifdef _DEBUG
                 MessageBox(NULL, L"bootstrapper couldn't be notified", NULL, MB_ICONERROR);
 #endif

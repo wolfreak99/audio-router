@@ -9,6 +9,11 @@
 #include <Audioclient.h>
 #include <Psapi.h>
 #include <cassert>
+#include "stacktrace\stack_exception.hpp"
+#include "util.h"
+
+using namespace std;
+using namespace stacktrace;
 
 #define IDD_TIMER_CONTROL_DLG 2
 #define TIMER_INTERVAL_CONTROL_DLG 10
@@ -621,9 +626,10 @@ void dialog_control::do_route(bool duplication)
             injector.populate_devicelist();
             injector.inject(this->pid, this->x86, sel_index, flush, duplication);
         }
-        catch (std::wstring err) {
-            err += L"Router functionality not available.";
-            this->MessageBoxW(err.c_str(), NULL, MB_ICONERROR);
+        catch (const exception & err) {
+            wstring errmsg = string_to_wstring(err.what());
+            errmsg += L"\nRouter functionality not available.";
+            this->MessageBoxW(errmsg.c_str(), NULL, MB_ICONERROR);
             return;
         }
         this->routing_state = (sel_index != 0 ? ROUTING : NO_STATE);
@@ -885,9 +891,10 @@ LRESULT dialog_control::OnPopUpSave(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*h
         try {
             bootstrap.save_routing(this->pid, devices[sel_index - 1]);
         }
-        catch (std::wstring err) {
+        catch (const exception & err) {
             app_inject::clear_devices(devices);
-            this->MessageBoxW(err.c_str(), NULL, MB_ICONERROR);
+            wstring errmsg = string_to_wstring(err.what());
+            this->MessageBoxW(errmsg.c_str(), NULL, MB_ICONERROR);
             return 0;
         }
         app_inject::clear_devices(devices);
@@ -938,8 +945,9 @@ LRESULT dialog_control::OnPopUpDelete(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /
             return 0;
         }
     }
-    catch (std::wstring err) {
-        this->MessageBoxW(err.c_str(), NULL, MB_ICONERROR);
+    catch (const exception & err) {
+        wstring errmsg = string_to_wstring(err.what());
+        this->MessageBoxW(errmsg.c_str(), NULL, MB_ICONERROR);
         return 0;
     }
     dialog_main& main = this->parent.parent;

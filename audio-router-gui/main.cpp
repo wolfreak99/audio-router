@@ -5,9 +5,12 @@
 #endif
 #include <gdiplus.h>
 #include <cassert>
-
 // #include <time.h>
 #include <stdlib.h>
+#include "stacktrace\stack_exception.hpp"
+
+using namespace std;
+using namespace stacktrace;
 
 #pragma comment(lib, "gdiplus.lib")
 
@@ -119,9 +122,10 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
         // TODO/audiorouterdev: decide if create a dummy bootstapper in case if the initialization fails
         bootstrap.reset(new bootstrapper);
     }
-    catch (std::wstring err) {
-        err += L"Audio Router will close.";
-        MessageBox(NULL, err.c_str(), NULL, MB_ICONERROR);
+    catch (const exception & err) {
+        wstring errmsg = string_to_wstring(err.what());
+        errmsg += L"\nAudio Router will close.";
+        MessageBox(NULL, errmsg.c_str(), NULL, MB_ICONERROR);
         goto cleanup;
     }
 #endif

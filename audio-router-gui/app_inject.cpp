@@ -7,6 +7,10 @@
 #include <mmdeviceapi.h>
 #include <functiondiscoverykeys_devpkey.h>
 #include <cassert>
+#include "stacktrace\stack_exception.hpp"
+
+using namespace std;
+using namespace stacktrace;
 
 #define MAKE_SESSION_GUID_AND_FLAG(guid, flag)\
     ((((DWORD)flag) << (sizeof(DWORD) * 8 - 2)) | (((DWORD)guid) & ~(3 << (sizeof(DWORD) * 8 - 2))))
@@ -172,14 +176,15 @@ void app_inject::inject(DWORD process_id, bool x86, size_t device_index, flush_t
         try {
             this->inject_dll(process_id, x86);
         }
-        catch (std::wstring err) {
+        catch (const exception & err) {
             throw err;
         }
         if (flush == SOFT) {
             reset_all_devices(false);
         }
         else if (flush == HARD && !reset_all_devices(true)) {
-            throw std::wstring(L"Stream flush in target process failed.\n");
+            throw stack_runtime_error(
+                "Stream flush in target process failed.\n");
         }
 
         return;
@@ -272,7 +277,8 @@ void app_inject::inject_dll(DWORD pid, bool x86, DWORD tid, DWORD flags)
     else {
         CloseHandle(pi.hProcess);
         CloseHandle(pi.hThread);
-        throw std::wstring(L"Audio Router delegate did not respond in time.\n");
+        throw stack_runtime_error(
+            "Audio Router delegate did not respond in time.\n");
     }
 
     CloseHandle(pi.hProcess);

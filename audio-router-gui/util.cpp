@@ -3,6 +3,9 @@
 #include <iomanip>
 #include <AclAPI.h>
 #include <sddl.h>
+#include "stacktrace/stack_exception.hpp"
+
+using namespace stacktrace;
 
 void throw_errormessage(DWORD errorcode)
 {
@@ -13,23 +16,27 @@ void throw_errormessage(DWORD errorcode)
 
         switch (errorcode) {
         case 0:
-            throw std::wstring(L"Invalid amount of parameters passed to audio router delegate.\n");
+            throw stack_runtime_error(
+                "Invalid amount of parameters passed to audio router delegate.\n");
         case 1:
-            throw std::wstring(
-                L"Process id parameter passed to audio router delegate is invalid.\n");
+            throw stack_runtime_error(
+                "Process id parameter passed to audio router delegate is invalid.\n");
         case 2:
 
             // currently initialization procedure covers loadlibrary & actual initialization;
             // target process might lack sufficient permissions for the procedure to start,
             // it does not contain audio functionality or file mapped parameters are invalid
-            throw std::wstring(
-                L"Initialization of audio routing functionality in target process failed.\n");
+            throw stack_runtime_error(
+                "Initialization of audio routing functionality in target process failed.\n");
         case 3:
-            throw std::wstring(L"Target process did not respond in time.\n");
+            throw stack_runtime_error(
+                "Target process did not respond in time.\n");
         case 4: // TODO/audiorouterdev: obsolete
-            throw std::wstring(L"Could not open target process.\n");
+            throw stack_runtime_error(
+                "Could not open target process.\n");
         default:
-            throw std::wstring(L"Unknown user-defined error.\n");
+            throw stack_runtime_error(
+                "Unknown user-defined error.\n");
         } // switch
     }
     else {
@@ -56,7 +63,8 @@ void throw_errormessage(DWORD errorcode)
             errmsg += L". Unknown error code.\n";
         }
 
-        throw errmsg;
+        std::string errmsgstr = wstring_to_string(errmsg);
+        throw stack_runtime_error(errmsgstr);
     }
 } // throw_errormessage
 
@@ -170,4 +178,28 @@ security_attributes::~security_attributes()
     if (this->psd) {
         LocalFree(this->psd);
     }
+}
+
+std::wstring string_to_wstring(const std::string& s)
+{
+    int len;
+    int slength = (int)s.length() + 1;
+    len = MultiByteToWideChar(CP_ACP, 0, s.c_str(), slength, 0, 0);
+    wchar_t* buf = new wchar_t[len];
+    MultiByteToWideChar(CP_ACP, 0, s.c_str(), slength, buf, len);
+    std::wstring r(buf);
+    delete[] buf;
+    return r;
+}
+
+std::string wstring_to_string(const std::wstring& s)
+{
+    int len;
+    int slength = (int)s.length() + 1;
+    len = WideCharToMultiByte(CP_ACP, 0, s.c_str(), slength, 0, 0, 0, 0);
+    char* buf = new char[len];
+    WideCharToMultiByte(CP_ACP, 0, s.c_str(), slength, buf, len, 0, 0);
+    std::string r(buf);
+    delete[] buf;
+    return r;
 }
