@@ -68,24 +68,24 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <TargetName>$(ProjectName)64</TargetName>
-    <OutDir>$(SolutionDir)bin\$(Configuration)\$(Platform)\Audio-Router\</OutDir>
+    <OutDir>$(SolutionDir)bin\$(Configuration)\$(Platform)\audio-router\</OutDir>
     <IncludePath>$(SolutionDir)third-party\WTL\Include;$(IncludePath)</IncludePath>
     <IntDir>$(SolutionDir)obj\$(Configuration)\$(Platform)\audio-router\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <TargetName>$(ProjectName)64</TargetName>
-    <OutDir>$(SolutionDir)bin\$(Configuration)\$(Platform)\Audio-Router\</OutDir>
+    <OutDir>$(SolutionDir)bin\$(Configuration)\$(Platform)\audio-router\</OutDir>
     <IncludePath>$(SolutionDir)third-party\WTL\Include;$(IncludePath)</IncludePath>
     <IntDir>$(SolutionDir)obj\$(Configuration)\$(Platform)\audio-router\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <IncludePath>$(SolutionDir)third-party\WTL\Include;$(IncludePath)</IncludePath>
-    <OutDir>$(SolutionDir)bin\$(Configuration)\$(Platform)\Audio-Router\</OutDir>
+    <OutDir>$(SolutionDir)bin\$(Configuration)\$(Platform)\audio-router\</OutDir>
     <IntDir>$(SolutionDir)obj\$(Configuration)\$(Platform)\audio-router\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <IncludePath>$(SolutionDir)third-party\WTL\Include;$(IncludePath)</IncludePath>
-    <OutDir>$(SolutionDir)bin\$(Configuration)\$(Platform)\Audio-Router\</OutDir>
+    <OutDir>$(SolutionDir)bin\$(Configuration)\$(Platform)\audio-router\</OutDir>
     <IntDir>$(SolutionDir)obj\$(Configuration)\$(Platform)\audio-router\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
