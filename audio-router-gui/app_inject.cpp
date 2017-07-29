@@ -3,6 +3,7 @@
 #include "policy_config.h"
 #include "util.h"
 #include "routing_params.h"
+#include "..\audio-router\common.h"
 #include <Audioclient.h>
 #include <mmdeviceapi.h>
 #include <functiondiscoverykeys_devpkey.h>
@@ -206,14 +207,10 @@ void app_inject::inject_dll(DWORD pid, bool x86, DWORD tid, DWORD flags)
     std::wstring folder = L"\"", exe = L"\"";
     folder += path;
     exe += path;
-    exe += L"\\do";
-
-    if (!x86) {
-        exe += L"64";
-    }
-
+    exe += L"\\";
+    exe += DO_EXE_NAME;
+    exe += L"\"";
     folder += L"\"";
-    exe += L".exe\"";
 
     // inject
     TCHAR buf[32] = {0};
@@ -267,12 +264,14 @@ void app_inject::inject_dll(DWORD pid, bool x86, DWORD tid, DWORD flags)
             CloseHandle(pi.hProcess);
             CloseHandle(pi.hThread);
             throw_errormessage(exitcode);
+            return;
         }
     }
     else {
         CloseHandle(pi.hProcess);
         CloseHandle(pi.hThread);
         throw std::wstring(L"Audio Router delegate did not respond in time.\n");
+        return;
     }
 
     CloseHandle(pi.hProcess);

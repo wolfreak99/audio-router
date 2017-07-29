@@ -25,6 +25,19 @@
 #  define PLATFORM_32BIT
 #endif
 
+#ifndef PLATFORM_64BIT
+#  define AUDIO_ROUTER_DLL_NAME L"audio-router\\audio-router.dll"
+#  define BOOTSTRAPPER_DLL_NAME L"bootstrapper\\bootstrapper.dll"
+#  define DO_EXE_NAME           L"do\\do.exe"
+#else
+#  define AUDIO_ROUTER_DLL_NAME L"audio-router\\audio-router64.dll"
+#  define BOOTSTRAPPER_DLL_NAME L"bootstrapper\\bootstrapper64.dll"
+#  define DO_EXE_NAME           L"do\\do64.exe"
+#endif
+
+#define AUDIO_ROUTER_EXE_NAME L"Audio Router.exe"
+#define LOCAL_PARAMS_FILE       L"saved_routings.dat"
+
 // LPT: Wrap macros with many lines in "do { } while (0)" to count as one line in bracketless IFs
 
 #define SafeFree(x)          do { free (x);     (x) = NULL;    } while (0)

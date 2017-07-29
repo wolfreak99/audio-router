@@ -1,6 +1,7 @@
 #include <Windows.h>
 #include <AclAPI.h>
 #include "..\audio-router\patcher.h"
+#include "..\audio-router\common.h"
 #include "..\audio-router-gui\routing_params.h"
 #define DELEGATION_ONLY_NAME
 #include "..\audio-router-gui\delegation.h"
@@ -9,12 +10,6 @@
 
 #define XOR_KEY ((char)(0xea))
 #define XOR_KEY2 ((char)(0x14))
-
-#ifndef _WIN64
-# define DLL_NAME L"bootstrapper.dll"
-#else
-# define DLL_NAME L"bootstrapper64.dll"
-#endif
 
 //
 // Unicode strings are counted 16-bit character strings. If they are
@@ -81,7 +76,7 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
     if (fdwReason == DLL_PROCESS_ATTACH) {
         is_patched = false;
 
-        if (GetModuleHandle(L"Audio Router.exe") != NULL) {
+        if (GetModuleHandle(AUDIO_ROUTER_EXE_NAME) != NULL) {
             return FALSE;
         }
 
