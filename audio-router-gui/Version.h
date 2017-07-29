@@ -2,8 +2,8 @@
 
 #include "..\audio-router\common.h"
 
-#define AUDIOROUTER_NAME               "AUDIOROUTER"
-#define AUDIOROUTER_VERSION            "0.1.1"
+#define AUDIOROUTER_NAME               "Audio-Router"
+#define AUDIOROUTER_VERSION            "0.0.1"
 
 #if defined(__amd64__) || defined(_M_AMD64)
 #define AUDIOROUTER_ARCHITECTURE       "x86-64"

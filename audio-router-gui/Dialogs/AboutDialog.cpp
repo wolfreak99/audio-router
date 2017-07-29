@@ -13,7 +13,7 @@ AboutDialog::AboutDialog(window& parent) : parent(parent)
 
 AboutDialog::~AboutDialog()
 {
-    
+
 }
 
 LRESULT AboutDialog::OnCreate(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL &bHandled)
@@ -26,6 +26,8 @@ LRESULT AboutDialog::OnCreate(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL &bHa
 
     // Set info text
     // TODO/wolfreak99: Finish text work
+    // TODO/wolfreak99: Make tab box show 3 tabs: general, changelog, and contributors
+
     auto pWnd = GetDlgItem(IDC_ABOUT_INFOTEXT);
     if (pWnd) {
         if (_infoText[0] == '\0') {
@@ -37,28 +39,31 @@ LRESULT AboutDialog::OnCreate(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL &bHa
     
     //this->_cTab1Ctrl = (CTabCtrl*)GetDlgItem(IDC_ABOUT_TAB1);
     //CButton* pButton = (CButton*)GetDlgItem(IDC_);
-
-}
-
-LRESULT AboutDialog::OnDestroy(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL &bHandled)
-{
-    bHandled = false;
+    
+    this->isVisible = true;
+    return TRUE;
 
 }
 
 LRESULT AboutDialog::OnClose(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL &bHandled)
 {
-    bHandled = false;
+    bHandled = true;
+    this->EndDialog(0);
+    this->isVisible = false;
+    
+    return 0;
 }
 
 LRESULT AboutDialog::OnGithubLinkClicked(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL &bHandled)
 {
-    ShellExecute(0, 0, L"http://www.github.com/wolfreak99/audio-router/", 0, 0, SW_SHOW);
     bHandled = true;
+    ShellExecute(0, 0, L"http://www.github.com/wolfreak99/audio-router/", 0, 0, SW_SHOW);
+    return 0;
 }
 
 LRESULT AboutDialog::OnCloseBtnClicked(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL &bHandled)
 {
-    bHandled = false;
-
+    bHandled = true;
+    SendMessage(WM_CLOSE);
+    return 0;
 }

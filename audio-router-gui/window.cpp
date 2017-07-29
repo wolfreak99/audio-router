@@ -1,4 +1,5 @@
 #include "window.h"
+#include "../audio-router/common.h"
 
 // TODO/wolfreak99: Check audiorouterdevs "remove saved routing functionality", To determine if bootstrap related to feature.
 #ifdef ENABLE_BOOTSTRAP
@@ -23,6 +24,7 @@ window::~window()
 
     delete this->form_view;
     delete this->m_SysTray;
+    delete this->dlg_about;
 }
 
 int window::OnCreate(LPCREATESTRUCT lpcs)
@@ -140,6 +142,11 @@ LRESULT window::OnFileRefreshlist(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL
 
 LRESULT window::OnAbout(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled)
 {
+    if (this->dlg_about) {
+        SafeDelete(this->dlg_about);
+    }
+    this->dlg_about->DoModal(*this);
+    /*
     // TODO/wolfreak99: Update this about to be more accurate, CLAIM OUR STOLEN FUCKING TERRITORY, FEARLESS OF LAWSUITS.
     this->MessageBoxW(L"Audio Router, the 'Revived from the grave' version.\n" \
         L"I have taken over this project, due to inactivity by the original developer." \
@@ -147,6 +154,7 @@ LRESULT window::OnAbout(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled
         L"Have a feature suggestion, or you are the original dev and wish to file a lawsuit, "\
         L"Feel free to post an issue on the github page and I will get back to you when I can!\n\n"\
         L"https://github.com/wolfreak99/audio-router", L"About", MB_ICONINFORMATION);
+        */
     return 0;
 }
 

@@ -20,6 +20,6 @@ AUDIOROUTER_NAME ", v" AUDIOROUTER_VERSION
 " provided by " AUDIOROUTER_BUILD_SERVER
 #endif
 #ifndef NDEBUG
-" (DEBUG)"
+" (Debug)"
 #endif
 ;

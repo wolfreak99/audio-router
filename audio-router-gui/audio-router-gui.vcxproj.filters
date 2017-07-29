@@ -133,4 +133,8 @@
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="Resources\Changelog.txt" />
+    <Text Include="Resources\Contributors.txt" />
+  </ItemGroup>
 </Project>

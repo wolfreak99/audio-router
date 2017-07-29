@@ -6,6 +6,7 @@
 #include "SysTray.h"
 #include <memory>
 #include <shellapi.h>
+#include "Dialogs/AboutDialog.h"
 
 #define WIN_WIDTH 970 // 400
 #define WIN_HEIGHT 670 // 360
@@ -16,7 +17,8 @@ enum {
     WM_SYSTEMTRAYICON,
 };
 
-class window : public CFrameWindowImpl<window>{
+class window : public CFrameWindowImpl<window>
+{
 private:
 
     bool dlg_main_b;
@@ -26,6 +28,8 @@ private:
 public:
 
     dialog_main *dlg_main;
+    AboutDialog *dlg_about;
+
     formview *form_view;
 #ifdef ENABLE_BOOTSTRAP
     bootstrapper *bootstrap;
