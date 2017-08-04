@@ -4,8 +4,9 @@
 #include "util.h"
 #include <cassert>
 #include <Psapi.h>
+#include "..\audio-router\common.h"
 
-#define LOCAL_PARAMS_FILE L"saved_routings.dat"
+
 #ifdef _DEBUG
 # define SET_FILTERS() { filters.push_back(L"explorer.exe"); /*filters.push_back(L"steam.exe");*/ }
 #else

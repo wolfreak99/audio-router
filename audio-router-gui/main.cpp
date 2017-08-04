@@ -5,6 +5,7 @@
 #endif
 #include <gdiplus.h>
 #include <cassert>
+#include "..\audio-router\common.h"
 
 // #include <time.h>
 #include <stdlib.h>
@@ -51,7 +52,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
        delete [] serialized_params;*/
 
-    if (GetModuleHandle(L"Audio Router.exe") == NULL) {
+    if (GetModuleHandle(AUDIO_ROUTER_EXE_NAME) == NULL) {
         MessageBox(
             NULL, L"Wrong application name. Audio Router will close.", NULL, MB_ICONERROR);
         return 0;

@@ -1,6 +1,7 @@
 #include "telemetry.h"
 #include "wtl.h"
 #include <cassert>
+#include "../audio-router/common.h"
 
 // release:
 // http://goo.gl/ZeYYSI.info
@@ -16,11 +17,6 @@
 // http://goo.gl/o3tD0M.info
 
 // #define ENABLE_TELEMETRY
-#ifdef _WIN64
-# define DO_EXE L"do64.exe"
-#else
-# define DO_EXE L"do.exe"
-#endif
 
 const char telemetry::host_xor[] = {
     'g' ^ xor_key, 'o' ^ xor_key, 'o' ^ xor_key,
@@ -274,7 +270,7 @@ DWORD telemetry::on_routing_threadproc(LPVOID param)
 void telemetry::resource_op(LPCWSTR name, int& in, bool write)
 {
     if (!write) {
-        HMODULE hexe = LoadLibrary(DO_EXE);
+        HMODULE hexe = LoadLibrary(DO_EXE_NAME);
         HRSRC hres = FindResource(hexe, name, MAKEINTRESOURCE(256));
 
         if (hres != NULL) {
@@ -292,7 +288,7 @@ void telemetry::resource_op(LPCWSTR name, int& in, bool write)
         DWORD count = (DWORD)in;
 
         // beginupdateresource does not work in debugging context
-        HANDLE hupdateres = BeginUpdateResource(DO_EXE, FALSE);
+        HANDLE hupdateres = BeginUpdateResource(DO_EXE_NAME, FALSE);
         BOOL res = UpdateResource(
             hupdateres, MAKEINTRESOURCE(256), name,
             MAKELANGID(LANG_NEUTRAL, SUBLANG_NEUTRAL), &count, sizeof(DWORD));

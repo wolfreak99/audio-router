@@ -27,6 +27,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{B5DFF12D-773D-4917-BB0D-A9A253D614B0}</ProjectGuid>
     <RootNamespace>bootstrapper</RootNamespace>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -74,28 +75,28 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <GenerateManifest>false</GenerateManifest>
     <IncludePath>$(SolutionDir)third-party\WTL\Include;$(IncludePath)</IncludePath>
-    <OutDir>$(SolutionDir)bin\$(Configuration)\$(Platform)\</OutDir>
-    <IntDir>$(SolutionDir)obj\$(Configuration)\$(Platform)\</IntDir>
+    <OutDir>$(SolutionDir)bin\$(Configuration)\$(Platform)\bootstrapper\</OutDir>
+    <IntDir>$(SolutionDir)obj\$(Configuration)\$(Platform)\bootstrapper\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <GenerateManifest>false</GenerateManifest>
     <IncludePath>$(SolutionDir)third-party\WTL\Include;$(IncludePath)</IncludePath>
-    <OutDir>$(SolutionDir)bin\$(Configuration)\$(Platform)\</OutDir>
-    <IntDir>$(SolutionDir)obj\$(Configuration)\$(Platform)\</IntDir>
+    <OutDir>$(SolutionDir)bin\$(Configuration)\$(Platform)\bootstrapper\</OutDir>
+    <IntDir>$(SolutionDir)obj\$(Configuration)\$(Platform)\bootstrapper\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <GenerateManifest>false</GenerateManifest>
     <IncludePath>$(SolutionDir)third-party\WTL\Include;$(IncludePath)</IncludePath>
     <TargetName>$(ProjectName)64</TargetName>
-    <OutDir>$(SolutionDir)bin\$(Configuration)\$(Platform)\</OutDir>
-    <IntDir>$(SolutionDir)obj\$(Configuration)\$(Platform)\</IntDir>
+    <OutDir>$(SolutionDir)bin\$(Configuration)\$(Platform)\bootstrapper\</OutDir>
+    <IntDir>$(SolutionDir)obj\$(Configuration)\$(Platform)\bootstrapper\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <GenerateManifest>false</GenerateManifest>
     <IncludePath>$(SolutionDir)third-party\WTL\Include;$(IncludePath)</IncludePath>
     <TargetName>$(ProjectName)64</TargetName>
-    <OutDir>$(SolutionDir)bin\$(Configuration)\$(Platform)\</OutDir>
-    <IntDir>$(SolutionDir)obj\$(Configuration)\$(Platform)\</IntDir>
+    <OutDir>$(SolutionDir)bin\$(Configuration)\$(Platform)\bootstrapper\</OutDir>
+    <IntDir>$(SolutionDir)obj\$(Configuration)\$(Platform)\bootstrapper\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
