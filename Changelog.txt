@@ -1,0 +1,12 @@
+Changelog:
+
+Version 0.0.01:
+- Feature: System Tray icon
+- Technical: Removed unused Telemetry code
+- Technical: Appveyor integration
+- Technical: Placeholder information in about window until better one is made
+- Technical: Placeholder Readme
+- Technical: Wrap previously removed bootstrapper code in "ENABLE_BOOTSTRAP"
+- Technical: Various code formatting and refactoring
+- Technical: Code upgraded to Visual Studio 2017
+- Source code forked from http://github.com/audiorouterdev/audio-router
