@@ -4,10 +4,6 @@
 #include <cstring>
 #include <cassert>
 
-#ifndef DISABLE_TELEMETRY
-extern telemetry *telemetry_m;
-#endif
-
 formview::formview(window& parent) : parent(parent)
 {
     /*try
@@ -150,13 +146,6 @@ void formview::open_dialog()
     app_inject::flush_t flush = forced ? app_inject::HARD : app_inject::SOFT;
 
     if (sel_index >= 0) {
-    #ifndef DISABLE_TELEMETRY
-
-        if (telemetry_m) {
-            telemetry_m->update_on_routing();
-        }
-
-    #endif
 
         // ------------preferred method which supports forced injection------------
         // const size_t app_index = this->compatible_apps.apps.size() - item.iItem - 1;

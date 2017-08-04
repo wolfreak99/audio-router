@@ -176,7 +176,6 @@
     <ClInclude Include="resource.h" />
     <ClInclude Include="routing_params.h" />
     <ClInclude Include="ScrollHelper.h" />
-    <ClInclude Include="telemetry.h" />
     <ClInclude Include="util.h" />
     <ClInclude Include="window.h" />
     <ClInclude Include="wtl.h" />
@@ -199,7 +198,6 @@
     <ClCompile Include="policy_config.cpp" />
     <ClCompile Include="routing_params.cpp" />
     <ClCompile Include="ScrollHelper.cpp" />
-    <ClCompile Include="telemetry.cpp" />
     <ClCompile Include="util.cpp" />
     <ClCompile Include="window.cpp" />
   </ItemGroup>

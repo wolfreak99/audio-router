@@ -39,9 +39,6 @@
     <ClInclude Include="util.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="telemetry.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="dialog_main.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -95,9 +92,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="util.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="telemetry.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="dialog_main.cpp">
