@@ -3,9 +3,6 @@
 #include "wtl.h"
 #include "app_list.h"
 #include "app_inject.h"
-#ifndef DISABLE_TELEMETRY
-# include "telemetry.h"
-#endif
 #include <vector>
 #include <string>
 #include <map>
@@ -56,8 +53,6 @@ private:
     window& parent;
     app_list compatible_apps;
     routed_processes_t routed_processes;
-
-    // telemetry telemetry_m;
 
     void add_item(const std::wstring& name, const std::wstring& routed_to);
     void open_dialog();

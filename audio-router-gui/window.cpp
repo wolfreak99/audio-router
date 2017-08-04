@@ -1,11 +1,6 @@
 #include "window.h"
 
-#ifndef DISABLE_TELEMETRY
-telemetry *telemetry_m = NULL;
-#endif
-
-// TODO/wolfreak99: Check audiorouterdevs "remove saved routing functionality", To determine if bootstrap (and
-// telemetry) are related to feature.
+// TODO/wolfreak99: Check audiorouterdevs "remove saved routing functionality", To determine if bootstrap related to feature.
 #ifdef ENABLE_BOOTSTRAP
 window::window(bootstrapper *bootstrap) : dlg_main_b(true), bootstrap(bootstrap)
 #else
@@ -28,19 +23,10 @@ window::~window()
 
     delete this->form_view;
     delete this->m_SysTray;
-
-#ifndef DISABLE_TELEMETRY
-    delete telemetry_m;
-    telemetry_m = NULL;
-#endif
 }
 
 int window::OnCreate(LPCREATESTRUCT lpcs)
 {
-#ifndef DISABLE_TELEMETRY
-    telemetry_m = new telemetry;
-#endif
-
     this->m_hWndClient = this->dlg_main->Create(this->m_hWnd);
     this->dlg_main->ShowWindow(SW_SHOW);
 
