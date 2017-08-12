@@ -44,3 +44,7 @@
 
 #define SafeDelete(x)        do { delete (x);   (x) = nullptr; } while (0)
 #define SafeDeleteArray(x)   do { delete[] (x); (x) = nullptr; } while (0)
+
+// #ifndef ENABLE_BOOTSTRAP
+// #define ENABLE_BOOTSTRAP
+// #endif

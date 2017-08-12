@@ -7,6 +7,7 @@
 #include <vector>
 #include <string>
 #include <memory>
+#include "../audio-router/common.h"
 
 class dialog_array;
 struct IAudioSessionControl2;

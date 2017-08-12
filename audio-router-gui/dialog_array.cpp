@@ -666,7 +666,7 @@ void dialog_array::choose_array_and_create_control(IAudioSessionControl *pSessio
         dialog_control *control;
         dialog_array *arr = this->parent.find_control(pid, &control, 0);
         #ifdef ENABLE_BOOTSTRAP
-        bootstrapper& bootstrap = this->parent.parent.bootstrap;
+        bootstrapper* bootstrap = this->parent.parent.bootstrap;
         #endif
 
         // check if control is found on default: add session if found;
@@ -678,8 +678,8 @@ void dialog_array::choose_array_and_create_control(IAudioSessionControl *pSessio
             return;
         }
 
-        #ifdef ENABLE_BOOSTRAP
-        else if (arr != NULL || bootstrap.is_managed_app(pid))
+        #ifdef ENABLE_BOOTSTRAP
+        else if (arr != NULL || bootstrap->is_managed_app(pid))
         #else
         else if (arr != NULL)
         #endif
