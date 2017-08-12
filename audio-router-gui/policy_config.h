@@ -1,5 +1,4 @@
 // ----------------------------------------------------------------------------
-
 // PolicyConfig.h
 // Undocumented COM-interface IPolicyConfig.
 // Use for set default audio render endpoint

@@ -1,14 +1,8 @@
 // DialogMessageHook.h: interface for the CDialogMessageHook class.
-
 //
 // ////////////////////////////////////////////////////////////////////
 
-#if !defined(AFX_DIALOGMESSAGEHOOK_H__53812B4C_FBAD_4FD3_8238_85CD48CFE453__INCLUDED_)
-#define AFX_DIALOGMESSAGEHOOK_H__53812B4C_FBAD_4FD3_8238_85CD48CFE453__INCLUDED_
-
-#if _MSC_VER > 1000
-# pragma once
-#endif // _MSC_VER > 1000
+#pragma once
 
 #include "wtl.h"
 #include <set>
@@ -36,8 +30,3 @@ private:
     // the set of HWNDs we are hooking
     static THWNDCollection m_aWindows;
 };
-
-#endif // if !defined(AFX_DIALOGMESSAGEHOOK_H__53812B4C_FBAD_4FD3_8238_85CD48CFE453__INCLUDED_)
-
-// !defined(AFX_DIALOGMESSAGEHOOK_H__53812B4C
-//        _FBAD_4FD3_8238_85CD48CFE453__INCLUDED_)

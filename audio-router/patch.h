@@ -1,4 +1,5 @@
 #pragma once
+
 #include <Audioclient.h>
 
 // TODO/audiorouterdev: iaudioclockadjustment implementation for adjusting sample rate

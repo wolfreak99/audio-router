@@ -2,14 +2,9 @@
 
 // S.Chan, 01 Jul 2005
 
-#ifndef SCROLL_HELPER_INCLUDED
-#define SCROLL_HELPER_INCLUDED
+#pragma once
 
 #include "wtl.h"
-
-#if _MSC_VER > 1000
-# pragma once
-#endif // _MSC_VER > 1000
 
 class CScrollHelper {
     typedef CWindow CWnd;
@@ -63,7 +58,5 @@ private:
     CSize  m_displaySize;
     CSize  m_scrollPos;
 };
-
-#endif // SCROLL_HELPER_INCLUDED
 
 // END
