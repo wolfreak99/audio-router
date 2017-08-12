@@ -2,7 +2,6 @@
 
 #include "wtl.h"
 #include "app_inject.h"
-#include "DialogMessageHook.h"
 #include <string>
 #include <list>
 

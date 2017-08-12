@@ -1,7 +1,6 @@
 #pragma once
 
 #include "wtl.h"
-#include "DialogMessageHook.h"
 #include "dialog_array.h" // for friend function
 #include <endpointvolume.h>
 #include <gdiplus.h>

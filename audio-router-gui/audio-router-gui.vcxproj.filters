@@ -51,9 +51,6 @@
     <ClInclude Include="ScrollHelper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="DialogMessageHook.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="routing_params.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -104,9 +101,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ScrollHelper.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="DialogMessageHook.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="routing_params.cpp">

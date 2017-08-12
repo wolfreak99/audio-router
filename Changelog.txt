@@ -2,6 +2,7 @@ Changelog:
 
 Version 0.0.01:
 - Feature: System Tray icon
+- Technical: Remove unused DialogMessageHook
 - Technical: Removed unused Telemetry code
 - Technical: Appveyor integration
 - Technical: Placeholder information in about window until better one is made

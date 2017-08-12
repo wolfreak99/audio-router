@@ -166,7 +166,6 @@
     <ClInclude Include="app_list.h" />
     <ClInclude Include="bootstrapper.h" />
     <ClInclude Include="SysTray.h" />
-    <ClInclude Include="DialogMessageHook.h" />
     <ClInclude Include="dialog_array.h" />
     <ClInclude Include="dialog_control.h" />
     <ClInclude Include="dialog_main.h" />
@@ -188,7 +187,6 @@
     <ClCompile Include="app_list.cpp" />
     <ClCompile Include="bootstrapper.cpp" />
     <ClCompile Include="SysTray.cpp" />
-    <ClCompile Include="DialogMessageHook.cpp" />
     <ClCompile Include="dialog_array.cpp" />
     <ClCompile Include="dialog_control.cpp" />
     <ClCompile Include="dialog_main.cpp" />

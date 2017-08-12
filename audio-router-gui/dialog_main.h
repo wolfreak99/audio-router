@@ -2,7 +2,6 @@
 
 #include "wtl.h"
 #include "ScrollHelper.h"
-#include "DialogMessageHook.h"
 #include "dialog_control.h"
 #include "dialog_array.h"
 #include <vector>
