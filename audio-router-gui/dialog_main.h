@@ -1,7 +1,7 @@
 #pragma once
 
 #include "wtl.h"
-#include "ScrollHelper.h"
+#include "dialog_main_scroll_helper.h"
 #include "dialog_control.h"
 #include "dialog_array.h"
 #include <vector>

@@ -48,7 +48,7 @@
     <ClInclude Include="dialog_array.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ScrollHelper.h">
+    <ClInclude Include="dialog_main_scroll_helper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="routing_params.h">
@@ -61,6 +61,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="SysTray.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dialog_main_scroll_helper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -100,7 +103,7 @@
     <ClCompile Include="dialog_array.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ScrollHelper.cpp">
+    <ClCompile Include="dialog_main_scroll_helper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="routing_params.cpp">
@@ -113,6 +116,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="SysTray.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="dialog_main_scroll_helper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
