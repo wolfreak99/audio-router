@@ -3,7 +3,7 @@
 // 2005-07-01 nschan Initial revision.
 // 2005-09-08 nschan Added GetClientRectSB() function.
 
-#include "ScrollHelper.h"
+#include "dialog_main_scroll_helper.h"
 #include <cassert>
 
 #define ASSERT assert
