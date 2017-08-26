@@ -1,6 +1,6 @@
 Changelog:
 
-Version 0.0.01:
+Version 0.0.01 (In development):
 - Feature: System Tray icon
 - Technical: Remove unused DialogMessageHook
 - Technical: Removed unused Telemetry code
