@@ -143,18 +143,12 @@ LRESULT window::OnFileRefreshlist(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL
 LRESULT window::OnAbout(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled)
 {
     if (this->dlg_about) {
-        SafeDelete(this->dlg_about);
+        this->dlg_about->DestroyWindow();
+        delete this->dlg_about;
     }
+
+    this->dlg_about = new AboutDialog(*this);
     this->dlg_about->DoModal(*this);
-    /*
-    // TODO/wolfreak99: Update this about to be more accurate, CLAIM OUR STOLEN FUCKING TERRITORY, FEARLESS OF LAWSUITS.
-    this->MessageBoxW(L"Audio Router, the 'Revived from the grave' version.\n" \
-        L"I have taken over this project, due to inactivity by the original developer." \
-        L"If you come across any bugs (especially related to, well, routing audio), " \
-        L"Have a feature suggestion, or you are the original dev and wish to file a lawsuit, "\
-        L"Feel free to post an issue on the github page and I will get back to you when I can!\n\n"\
-        L"https://github.com/wolfreak99/audio-router", L"About", MB_ICONINFORMATION);
-        */
     return 0;
 }
 

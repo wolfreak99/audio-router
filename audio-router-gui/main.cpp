@@ -125,24 +125,27 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 #endif
 
     {
-        window win = (window)NULL;
+        window* win = new window();
         RECT r = {
             CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT + WIN_WIDTH, CW_USEDEFAULT + WIN_HEIGHT
         };
 
-        if (win.CreateEx(NULL, &r) == NULL) {
+        if (win->CreateEx(NULL, &r) == NULL) {
             MessageBox(NULL,
                 L"Could not create window. Audio Router will close.",
                 NULL,
                 MB_ICONERROR);
+            
+            win->DestroyWindow();
+
             goto cleanup;
         }
 
-        win.ShowWindow(nCmdShow);
-        win.UpdateWindow();
+        win->ShowWindow(nCmdShow);
+        win->UpdateWindow();
 
         while (GetMessage(&msg, NULL, 0, 0) > 0) {
-            if (win.dlg_main && IsDialogMessage(*win.dlg_main, &msg)) {
+            if (win->dlg_main && IsDialogMessage(win->dlg_main->m_hWnd, &msg)) {
                 continue;
             }
 
