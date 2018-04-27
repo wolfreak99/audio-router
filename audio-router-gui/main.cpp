@@ -125,7 +125,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 #endif
 
     {
-        window win = (window)NULL;
+        window win;
         RECT r = {
             CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT + WIN_WIDTH, CW_USEDEFAULT + WIN_HEIGHT
         };
